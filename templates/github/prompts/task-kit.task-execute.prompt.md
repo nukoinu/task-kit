@@ -1,6 +1,6 @@
 ---
 description: "plan.md の対象ステップ実行を支援し、記録ファイルへ結果を残す。"
-name: "Task Kit Task Execute"
+name: "task-kit.task-execute"
 argument-hint: "タスクパスと対象ステップ(任意)を入力してください"
 agent: "task-kit.task"
 ---

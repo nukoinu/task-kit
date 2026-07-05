@@ -1,6 +1,6 @@
 ---
 description: "plan.md を更新し、依存、制約、リスク前提を明示する。"
-name: "Task Kit Plan Update"
+name: "task-kit.plan-update"
 argument-hint: "タスクパスと計画更新内容を入力してください"
 agent: "task-kit.task"
 ---

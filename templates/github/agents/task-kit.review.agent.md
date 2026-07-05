@@ -1,6 +1,6 @@
 ---
 description: "Use for /task-kit.review with independent review stance. 実装担当から独立した観点で重大度付き指摘を返す。"
-name: "Task Kit Review Agent"
+name: "task-kit.review"
 tools: [read, search, execute, todo]
 argument-hint: "タスクパス、レビュー対象、観点、期待仕様を入力してください"
 user-invocable: true

@@ -1,6 +1,6 @@
 ---
 description: "新規タスク作業領域を作成する。日付階層と日次連番を前提に task.md などの初期ファイルを生成するための実行指示を組み立てる。"
-name: "Task Kit New Task"
+name: "task-kit.new-task"
 argument-hint: "タスクタイトルを入力してください"
 agent: "task-kit.task"
 ---

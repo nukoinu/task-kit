@@ -1,6 +1,6 @@
 ---
 description: "Use for task execution commands in Task-Kit. new-task, task-update, plan-update, task-execute, issue-consult を一貫した状態遷移と整合チェックで実行する。"
-name: "Task Kit Task Agent"
+name: "task-kit.task"
 tools: [read, search, edit, execute, todo]
 argument-hint: "タスクパス、コマンド名、入力、制約、成功条件を入力してください"
 user-invocable: true

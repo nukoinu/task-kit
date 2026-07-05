@@ -1,6 +1,6 @@
 ---
 description: "issue.md の課題をもとに解決助言と優先度提案を返す。"
-name: "Task Kit Issue Consult"
+name: "task-kit.issue-consult"
 argument-hint: "タスクパスと課題IDまたは課題記述を入力してください"
 agent: "task-kit.task"
 ---

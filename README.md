@@ -75,15 +75,15 @@ task-kit init
 
 - `templates/github/agents/task-kit.task.agent.md`
 - `templates/github/agents/task-kit.review.agent.md`
-
-### .task-kit へ展開
-
 - `templates/.task-kit/prompts/task-kit.new-task.prompt.md`
 - `templates/.task-kit/prompts/task-kit.task-update.prompt.md`
 - `templates/.task-kit/prompts/task-kit.plan-update.prompt.md`
 - `templates/.task-kit/prompts/task-kit.task-execute.prompt.md`
 - `templates/.task-kit/prompts/task-kit.review.prompt.md`
 - `templates/.task-kit/prompts/task-kit.issue-consult.prompt.md`
+
+### .task-kit へ展開
+
 - `templates/.task-kit/templates/tasks/task.md`
 - `templates/.task-kit/templates/tasks/plan.md`
 - `templates/.task-kit/templates/tasks/issue.md`

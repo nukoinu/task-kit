@@ -1,6 +1,6 @@
 ---
 description: "既存 task.md を更新し、変更理由と差分要約を残す。"
-name: "Task Kit Task Update"
+name: "task-kit.task-update"
 argument-hint: "タスクパスと変更要求を入力してください"
 agent: "task-kit.task"
 ---

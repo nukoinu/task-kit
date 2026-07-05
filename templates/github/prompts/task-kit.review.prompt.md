@@ -1,6 +1,6 @@
 ---
 description: "レビュー対象を重大度付きで評価し、修正提案を返す。"
-name: "Task Kit Review"
+name: "task-kit.review"
 argument-hint: "タスクパス、レビュー対象、観点(任意)を入力してください"
 agent: "task-kit.review"
 ---

@@ -41,7 +41,7 @@ async function resolveTemplatesRoot() {
   ];
 
   for (const candidate of candidates) {
-    if (await pathExists(candidate)) {
+    if (await hasRequiredTemplates(candidate)) {
       return candidate;
     }
   }
@@ -49,6 +49,35 @@ async function resolveTemplatesRoot() {
   throw new AppError(
     "テンプレートディレクトリを解決できませんでした。",
     EXIT_CODES.INTERNAL_ERROR,
+  );
+}
+
+async function hasRequiredTemplates(rootPath) {
+  const githubRoot = path.join(rootPath, "github");
+  const taskKitRoot = path.join(rootPath, ".task-kit");
+  const promptsRoot = path.join(githubRoot, "prompts");
+
+  if (!(await pathExists(githubRoot))) {
+    return false;
+  }
+
+  if (!(await pathExists(taskKitRoot))) {
+    return false;
+  }
+
+  if (!(await pathExists(promptsRoot))) {
+    return false;
+  }
+
+  let promptEntries;
+  try {
+    promptEntries = await fs.readdir(promptsRoot, { withFileTypes: true });
+  } catch {
+    return false;
+  }
+
+  return promptEntries.some(
+    (entry) => entry.isFile() && entry.name.endsWith(".prompt.md"),
   );
 }
 
