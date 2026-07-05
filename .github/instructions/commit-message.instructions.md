@@ -1,33 +1,44 @@
 ---
-description: "Use when creating git commit messages, proposing commit text, or preparing commit history. Enforce Conventional Commits format and quality checks."
-name: "Commit Message Convention"
+description: "git commit メッセージの作成、提案、履歴整理時に使う。Conventional Commits の形式と品質基準を適用する。"
+name: "コミットメッセージ規約"
 applyTo: "**"
 ---
-# Commit Message Convention
+# コミットメッセージ規約
 
-Use Conventional Commits for all commit messages.
-Write commit summaries and bodies in Japanese.
+すべてのコミットメッセージで Conventional Commits を使用する。
+要約行と本文は日本語で記述する。
 
-## Format
+## 形式
 
 `<type>(<scope>): <summary>`
 
-- `type`: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `build`, `ci`, `perf`, `style`, `revert`
-- `scope`: optional, short module name such as `api`, `ui`, `auth`
-- `summary`: required, 50 characters or less, no trailing period, written in Japanese
+- `type`: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `build`, `ci`, `perf`, `style`, `revert` のいずれかを使う。
+- `scope`: 任意。`api`、`ui`、`auth` のような短いモジュール名を使う。
+- `summary`: 必須。50 文字以内、日本語、末尾に句点を付けない。
 
-## Rules
+## ルール
 
-- Prefer one logical change per commit.
-- Write summary and body in Japanese.
-- Explain why in the body when context is not obvious.
-- Wrap body lines around 72 characters.
-- Use `BREAKING CHANGE:` footer for incompatible changes.
-- Reference issues in footer when relevant, for example `Refs: #123`.
+- 1 つのコミットでは 1 つの論理変更に絞る。
+- 要約行と本文は日本語で書く。
+- 本文は任意とする。ただし、変更理由や背景が要約行だけで伝わらない場合は本文を付ける。
+- 本文を書く場合は、要約行との間に 1 行空ける。
+- 本文の各行は 72 文字前後で折り返す。
+- 互換性を壊す変更がある場合は、フッターに `BREAKING CHANGE:` を使う。
+- 関連 Issue がある場合は、フッターに `Refs: #123` のように記載する。
 
-## Examples
+## 例
 
 - `feat(auth): トークン更新エンドポイントを追加`
 - `fix(api): Webhook の空ペイロードを正しく処理`
 - `docs(readme): ローカルセットアップ手順を追記`
 - `refactor(ui): ダッシュボードカードを分割`
+
+## 良い例
+
+- `fix(api): 空入力時の検証漏れを修正`
+- `docs: レビュー手順の前提条件を追記`
+
+## 悪い例
+
+- `バグ修正`
+- `fix: バグを修正しました。`

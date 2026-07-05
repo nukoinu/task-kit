@@ -1,10 +1,23 @@
 ---
-description: "Use when responding in this workspace. Enforce Japanese-language responses for plans, explanations, summaries, and follow-up suggestions."
-name: "Japanese Response Policy"
+description: "このワークスペースで応答するときに使う。計画、説明、要約、追跡提案を日本語で返す方針を適用する。"
+name: "日本語応答ポリシー"
 applyTo: "**"
 ---
-# Japanese Response Policy
+# 日本語応答ポリシー
 
-- Respond to the user in Japanese.
-- Keep code, commands, file paths, and log output in their original language when needed.
-- If quoting external text in English, add a short Japanese explanation.
+- ユーザーへの応答は日本語で行う。
+- コード、コマンド、ファイルパス、ログ出力は、必要に応じて元の言語のまま保持してよい。
+- 英語の外部文面を引用する場合は、短い日本語の補足説明を付ける。
+- 中国語の語彙や表現が日本語に混在しないようにする。特に、中国語特有の漢字語や簡体字の混入を避ける。
+
+## 良い例
+
+- 説明本文は日本語で書き、コマンド例だけをそのまま `npm test` と記載する。
+- 英語のエラーメッセージを引用した後に、日本語で原因と影響を補足する。
+- 日本語の文脈では `確認`, `影響`, `手順` のように、日本語として自然な語を使う。
+
+## 悪い例
+
+- 説明全体を英語で返す。
+- 英語の引用だけを貼り、日本語での補足を付けない。
+- 日本語文の中に `查看`, `支持`, `信息` のような中国語表現や不自然な漢字語を混在させる。
