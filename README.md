@@ -1,17 +1,16 @@
 # Task-Kit
 
 Task-Kit は、VS Code workspace でタスク遂行フローを再現可能にするための配布キットです。
-CLI で `.github` と `.task-kit` の運用資産を展開し、チャットコマンドでタスク作成から実行、レビュー、報告、引き継ぎまでを支援します。
+CLI で `.github` と `.task-kit` の運用資産を展開し、VS Code から利用するエージェント定義、プロンプト、テンプレートを配布します。
 
 ## できること
 
 - `task-kit init` による配布物展開
-- タスク作成、修正、実行、アーカイブ
-- プラン作成、修正、実行
-- レビュー実行支援
-- 報告書作成、課題管理、リスク検出
-- 引き継ぎ資料作成
-- Slack/Teams 向けリード文作成(投稿文生成まで)
+- `.github` 配下へのエージェント定義とプロンプトの展開
+- `.task-kit` 配下へのタスク運用テンプレートと既定ファイルの展開
+- タスク作成、プラン更新、レビューなどの運用フローを支えるチャット用プロンプトの配布
+
+現時点で CLI から実行できるコマンドは `task-kit init` のみです。タスク作成、更新、レビューなどの運用フローは、展開されるプロンプトとテンプレートで支援します。
 
 ## 前提条件
 
@@ -73,26 +72,29 @@ task-kit init
 
 ### .github へ展開
 
-- `templates/github/agents/task-kit.task.agent.md`
-- `templates/github/agents/task-kit.review.agent.md`
-- `templates/.task-kit/prompts/task-kit.new-task.prompt.md`
-- `templates/.task-kit/prompts/task-kit.task-update.prompt.md`
-- `templates/.task-kit/prompts/task-kit.plan-update.prompt.md`
-- `templates/.task-kit/prompts/task-kit.task-execute.prompt.md`
-- `templates/.task-kit/prompts/task-kit.review.prompt.md`
-- `templates/.task-kit/prompts/task-kit.issue-consult.prompt.md`
+- `.github/agents/task-kit.task.agent.md`
+- `.github/agents/task-kit.review.agent.md`
+- `.github/prompts/task-kit.new-task.prompt.md`
+- `.github/prompts/task-kit.task-update.prompt.md`
+- `.github/prompts/task-kit.plan-update.prompt.md`
+- `.github/prompts/task-kit.task-execute.prompt.md`
+- `.github/prompts/task-kit.review.prompt.md`
+- `.github/prompts/task-kit.issue-consult.prompt.md`
 
 ### .task-kit へ展開
 
-- `templates/.task-kit/templates/tasks/task.md`
-- `templates/.task-kit/templates/tasks/plan.md`
-- `templates/.task-kit/templates/tasks/issue.md`
-- `templates/.task-kit/templates/tasks/handoff.md`
-- `templates/.task-kit/templates/tasks/records/findings.md`
-- `templates/.task-kit/templates/tasks/records/scratchpad.md`
-- `templates/.task-kit/current-task.md`
+- `.task-kit/current-task.md`
+- `.task-kit/defaults/user-profile.md`
+- `.task-kit/templates/tasks/task.md`
+- `.task-kit/templates/tasks/plan.md`
+- `.task-kit/templates/tasks/issue.md`
+- `.task-kit/templates/tasks/handoff.md`
+- `.task-kit/templates/tasks/records/findings.md`
+- `.task-kit/templates/tasks/records/scratchpad.md`
+- `.task-kit/templates/tasks/references/.gitkeep`
+- `.task-kit/templates/tasks/outputs/.gitkeep`
 
-## チャットコマンド(設計上の運用コマンド)
+## 同梱されるチャット用プロンプト
 
 - `/task-kit.new-task`
 - `/task-kit.task-update`
@@ -101,7 +103,9 @@ task-kit init
 - `/task-kit.review`
 - `/task-kit.issue-consult`
 
-## new-task の起票ルール
+これらは `.github/prompts` と関連テンプレートとして展開され、VS Code 上の運用フローを支援します。CLI サブコマンドとしてはまだ実装していません。
+
+## 含まれる運用ルールの例
 
 `/task-kit.new-task` は対話形式で起票し、次を最低限ヒアリングする。
 
