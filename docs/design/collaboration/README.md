@@ -13,6 +13,9 @@
 ### Skills
 - .github/skills/document-review-minimum.SKILL.md
 
+### Prompts
+- .github/prompts/codex-collaboration.prompt.md
+
 ### Terminology Governance
 - docs/terminology/term-governance.md
 - docs/terminology/misuse-log.md
