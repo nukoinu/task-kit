@@ -1,0 +1,31 @@
+name: Release CLI Asset
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-cli-package:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build release tarball
+        working-directory: cli
+        run: |
+          npm install
+          npm run pack:release
+
+      - name: Upload tarball to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: cli/task-kit-cli-*.tgz

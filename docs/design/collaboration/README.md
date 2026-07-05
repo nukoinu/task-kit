@@ -12,6 +12,8 @@
 - .github/agents/solution-designer.agent.md
 - .github/agents/document-author.agent.md
 - .github/agents/document-reviewer.agent.md
+- templates/github/agents/task-kit.task.agent.md
+- templates/github/agents/task-kit.review.agent.md
 
 ### Instructions
 - .github/instructions/commit-message.instructions.md
@@ -26,6 +28,12 @@
 
 ### Prompts
 - .github/prompts/codex-collaboration.prompt.md
+- templates/.task-kit/prompts/task-kit.new-task.prompt.md
+- templates/.task-kit/prompts/task-kit.task-update.prompt.md
+- templates/.task-kit/prompts/task-kit.plan-update.prompt.md
+- templates/.task-kit/prompts/task-kit.task-execute.prompt.md
+- templates/.task-kit/prompts/task-kit.review.prompt.md
+- templates/.task-kit/prompts/task-kit.issue-consult.prompt.md
 
 ### Terminology Governance
 - docs/terminology/term-governance.md
@@ -39,6 +47,12 @@
 - docs/templates/common-agent-input-template.md
 - docs/templates/solution-design-template.md
 - docs/templates/team-review-record-template.md
+- templates/.task-kit/templates/tasks/task.md
+- templates/.task-kit/templates/tasks/plan.md
+- templates/.task-kit/templates/tasks/issue.md
+- templates/.task-kit/templates/tasks/handoff.md
+- templates/.task-kit/templates/tasks/records/findings.md
+- templates/.task-kit/templates/tasks/records/scratchpad.md
 
 ## Update Policy
 1. 仕様や運用の変更は、上記の一次情報ファイルのみ更新する。

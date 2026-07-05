@@ -103,6 +103,16 @@ VS Code チャット入力から実行可能とするコマンドを以下に固
 | `/task-kit.review` | レビュー実行支援 | タスクパス、レビュー対象、観点 | 指摘一覧、修正提案 | `records/findings.md`, `outputs/` |
 | `/task-kit.issue-consult` | 課題の解決助言 | タスクパス、課題IDまたは課題記述 | 助言、対応案、優先度提案 | `issue.md`, `records/findings.md` |
 
+### 5.3 チャットコマンド実行エージェント方針(確定)
+チャットコマンドの実行責務は次の2エージェントへ分離する。
+
+- `task-kit.task`:
+  - 対象コマンド: `/task-kit.new-task`, `/task-kit.task-update`, `/task-kit.plan-update`, `/task-kit.task-execute`, `/task-kit.issue-consult`
+  - 目的: コマンド間整合、タスク内整合、状態遷移整合を一貫して管理する。
+- `task-kit.review`:
+  - 対象コマンド: `/task-kit.review`
+  - 目的: 実行系エージェントから独立したレビュー観点を維持する。
+
 
 ## 6. 境界と責務
 - 画面/CLI:

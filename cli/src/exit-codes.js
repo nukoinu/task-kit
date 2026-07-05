@@ -1,0 +1,12 @@
+const EXIT_CODES = Object.freeze({
+  SUCCESS: 0,
+  INPUT_ERROR: 1,
+  PATH_OR_PERMISSION_ERROR: 2,
+  NETWORK_ERROR: 3,
+  PLAN_CONSTRAINT_ERROR: 4,
+  CONFLICT_ERROR: 5,
+  INTERNAL_ERROR: 6,
+  CANCELED: 7,
+});
+
+module.exports = { EXIT_CODES };
