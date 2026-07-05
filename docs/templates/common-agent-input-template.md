@@ -19,7 +19,7 @@
 - 依頼名:
 - 依頼日:
 - 依頼者:
-- 対象エージェント: requirements-spec-coordinator / document-author / document-reviewer
+- 対象エージェント: requirements-spec-coordinator / solution-designer / document-author / document-reviewer
 - 優先順位: 品質 > 速度 > 説明責任
 
 ## 2. 目的と背景
@@ -65,7 +65,13 @@
 - 文体・表記の指定:
 - 変更履歴の粒度:
 
-### C. document-reviewer 向け追記
+### C. solution-designer 向け追記
+- 対象システム/機能:
+- 想定する設計レベル(概要設計/詳細設計前提整理):
+- 前提技術/既存構成:
+- 特に詰めたい境界(API/画面/データ/権限/例外系):
+
+### D. document-reviewer 向け追記
 - レビュー観点の重点:
 - 重大度判定で厳しく見る点:
 - 除外範囲:

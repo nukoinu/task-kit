@@ -7,6 +7,7 @@
 
 ### Agent Definitions
 - .github/agents/requirements-spec-coordinator.agent.md
+- .github/agents/solution-designer.agent.md
 - .github/agents/document-author.agent.md
 - .github/agents/document-reviewer.agent.md
 
@@ -30,6 +31,7 @@
 - .github/ISSUE_TEMPLATE/bug-report.md
 - .github/ISSUE_TEMPLATE/documentation-change.md
 - docs/templates/common-agent-input-template.md
+- docs/templates/solution-design-template.md
 - docs/templates/team-review-record-template.md
 
 ## Update Policy
