@@ -90,6 +90,7 @@ task-kit init
 - `templates/.task-kit/templates/tasks/handoff.md`
 - `templates/.task-kit/templates/tasks/records/findings.md`
 - `templates/.task-kit/templates/tasks/records/scratchpad.md`
+- `templates/.task-kit/current-task.md`
 
 ## チャットコマンド(設計上の運用コマンド)
 
@@ -99,6 +100,30 @@ task-kit init
 - `/task-kit.task-execute`
 - `/task-kit.review`
 - `/task-kit.issue-consult`
+
+## new-task の起票ルール
+
+`/task-kit.new-task` は対話形式で起票し、次を最低限ヒアリングする。
+
+- タイトル(slug 確認を含む)
+- 目的・背景
+- 完了条件
+- 期限(未指定時は当日)
+- 担当者(既定担当者があれば初期値として利用)
+- 依頼者(未指定時は担当者と同値)
+- 作業方針・アプローチ(任意)
+
+想定されるリスクと課題候補は、ヒアリング済み入力をもとに AI が補完して `task.md` へ反映する。
+
+既定担当者は `.task-kit/defaults/user-profile.md` で初回設定時のみ保存する。
+
+新規タスク作成後は、`.task-kit/current-task.md` を新規タスクへ切り替えるかを確認し、同意時のみ更新する。
+
+## current-task の運用ルール
+
+- `task` 系および `review` エージェントは、実行前に `.task-kit/current-task.md` を参照してカレントタスクを把握する。
+- タスクパス未指定時は、`.task-kit/current-task.md` のタスクパスを既定値として利用する。
+- タスクパス指定値とカレントタスクが不一致の場合は、どちらを対象にするか確認してから実行する。
 
 ## 禁止事項
 

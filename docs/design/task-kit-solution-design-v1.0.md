@@ -71,7 +71,7 @@
 | 機能 | 責務 | 入力 | 出力 | 備考 |
 |---|---|---|---|---|
 | F1. 配布物展開(init) | `.github` と `.task-kit` へキット一式を展開 | 展開先パス、上書き方針、`--copilot` | 配置結果、終了コード | 競合時は確認または失敗 |
-| F2. タスク起票(new-task) | タスク作業領域の新規作成 | `/task-kit.new-task <title>` | `tasks/YYYY/MM/DD/NNN-slug` 一式 | 日次連番とslugを自動採番 |
+| F2. タスク起票(new-task) | タスク作業領域の新規作成 | `/task-kit.new-task`(対話入力) | `tasks/YYYY/MM/DD/NNN-slug` 一式 | 日次連番とslugを自動採番、必須項目をヒアリング |
 | F3. タスク修正 | タスク定義の更新 | task.md、追加要件 | 更新済み task.md | 変更履歴を残す |
 | F4. プラン作成/修正/実行 | 実行計画の構築・更新と実行記録 | plan.md、依存、リスク前提 | plan.md、records | 実行前後で差分記録 |
 | F5. レビュープロンプト生成 | レビュー観点を定義した入力の生成 | 対象成果物、観点、制約 | レビュープロンプト | 禁止事項チェック対象 |
@@ -96,12 +96,12 @@ VS Code チャット入力から実行可能とするコマンドを以下に固
 
 | コマンド | 目的 | 主入力 | 主出力 | 主更新対象 |
 |---|---|---|---|---|
-| `/task-kit.new-task` | 新規タスク作業領域を作成 | タスクタイトル | `tasks/YYYY/MM/DD/NNN-slug` パス | `task.md`, `plan.md`, `issue.md`, `handoff.md` |
-| `/task-kit.task-update` | タスク定義を更新 | タスクパス、変更要求 | 更新済み task.md、差分要約 | `task.md`, `records/findings.md` |
-| `/task-kit.plan-update` | 実行計画を更新 | タスクパス、依存、制約 | 更新済み plan.md | `plan.md`, `records/scratchpad.md` |
-| `/task-kit.task-execute` | プラン実行支援と記録更新 | タスクパス、対象ステップ | 実行ログ、進捗更新 | `plan.md`, `records/*`, `outputs/` |
-| `/task-kit.review` | レビュー実行支援 | タスクパス、レビュー対象、観点 | 指摘一覧、修正提案 | `records/findings.md`, `outputs/` |
-| `/task-kit.issue-consult` | 課題の解決助言 | タスクパス、課題IDまたは課題記述 | 助言、対応案、優先度提案 | `issue.md`, `records/findings.md` |
+| `/task-kit.new-task` | 新規タスク作業領域を作成 | タイトル、目的・背景、完了条件、期限、担当者、依頼者、作業方針・アプローチ(任意) | `tasks/YYYY/MM/DD/NNN-slug` パス | `task.md`, `plan.md`, `issue.md`, `handoff.md` |
+| `/task-kit.task-update` | タスク定義を更新 | タスクパス(任意)、変更要求 | 更新済み task.md、差分要約 | `task.md`, `records/findings.md` |
+| `/task-kit.plan-update` | 実行計画を更新 | タスクパス(任意)、依存、制約 | 更新済み plan.md | `plan.md`, `records/scratchpad.md` |
+| `/task-kit.task-execute` | プラン実行支援と記録更新 | タスクパス(任意)、対象ステップ | 実行ログ、進捗更新 | `plan.md`, `records/*`, `outputs/` |
+| `/task-kit.review` | レビュー実行支援 | タスクパス(任意)、レビュー対象、観点 | 指摘一覧、修正提案 | `records/findings.md`, `outputs/` |
+| `/task-kit.issue-consult` | 課題の解決助言 | タスクパス(任意)、課題IDまたは課題記述 | 助言、対応案、優先度提案 | `issue.md`, `records/findings.md` |
 
 ### 5.3 チャットコマンド実行エージェント方針(確定)
 チャットコマンドの実行責務は次の2エージェントへ分離する。
@@ -134,6 +134,7 @@ VS Code チャット入力から実行可能とするコマンドを以下に固
 ## 7. データとインターフェース方針
 - 主なデータ構造:
   - タスクディレクトリ: `tasks/YYYY/MM/DD/NNN-slug`
+  - カレントタスク: `.task-kit/current-task.md`
   - 初期ファイル: `task.md`, `plan.md`, `issue.md`, `handoff.md`
   - 記録ファイル: `records/findings.md`, `records/scratchpad.md`
   - 初期ディレクトリ: `references/`, `outputs/` (`.gitkeep` を配置)
@@ -141,13 +142,16 @@ VS Code チャット入力から実行可能とするコマンドを以下に固
   - 1タスク1ディレクトリを基本単位とし、配下文書を更新する。
   - 日次フォルダ内で3桁連番(`001-...`)を採番する。
 - インターフェース契約:
-  - new-task 入力: タイトル必須、空文字は終了コード1。
+  - new-task 入力: タイトル、目的・背景、完了条件を必須ヒアリング。期限未指定時は当日、依頼者未指定時は担当者を既定適用。既定担当者の保存は未設定時の初回のみ。
   - new-task 出力: 新規タスクパスを標準出力で返却。
-  - task-update 入力: タスクパスと変更要求必須。未指定は終了コード1。
-  - plan-update 入力: タスクパスと計画更新内容必須。未指定は終了コード1。
-  - task-execute 入力: タスクパス必須。対象ステップ未指定時は未完了ステップを既定対象とする。
-  - review 入力: タスクパスとレビュー対象必須。レビュー観点省略時は標準観点を適用。
-  - issue-consult 入力: タスクパスと課題記述必須。課題IDがあれば優先参照する。
+  - new-task 後: `.task-kit/current-task.md` を新規タスクへ切り替えるか確認し、同意時のみ更新する。
+  - task/update、plan/update、task-execute、review、issue-consult: タスクパス未指定時は `.task-kit/current-task.md` のタスクパスを既定参照する。
+  - task/update、plan/update、task-execute、review、issue-consult: タスクパス指定値とカレントタスクが不一致の場合は対象を確認してから実行する。
+  - task-update 入力: 変更要求必須。
+  - plan-update 入力: 計画更新内容必須。
+  - task-execute 入力: 対象ステップ未指定時は未完了ステップを既定対象とする。
+  - review 入力: レビュー対象必須。レビュー観点省略時は標準観点を適用。
+  - issue-consult 入力: 課題記述必須。課題IDがあれば優先参照する。
   - CLI 入力: 必須引数不足は終了コード1。
   - パス/権限異常: 終了コード2。
   - ネットワーク異常: 終了コード3。
