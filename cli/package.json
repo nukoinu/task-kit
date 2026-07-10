@@ -21,6 +21,7 @@
     "pack:release": "npm pack",
     "start": "node src/index.js",
     "init": "node src/index.js init",
-    "check": "node --check src/index.js && node --check src/services/init.js"
+    "check": "node --check src/index.js && node --check src/services/init.js",
+    "test": "node --test"
   }
 }

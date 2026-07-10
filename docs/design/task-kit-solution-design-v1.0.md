@@ -33,6 +33,7 @@
 - 成功条件:
   - `task-kit init` 実行で、現在のワークスペースに `.github` と `.task-kit` へ必要資産を展開できる。
   - `task-kit init --copilot` は `task-kit init` と同一動作の別表記として扱う。
+  - `task-kit init --sync` は、廃止された Task-Kit 管理資産だけを削除できる。
   - `/task-kit.new-task <task title>` 実行で、日付階層を持つタスクディレクトリと初期ファイル群を生成できる。
   - 主要ユースケースが手順化され、再現実行できる。
   - 禁止事項(タスクキット利用事実の混入禁止、機密情報保護)を出力設計に組み込む。
@@ -83,11 +84,11 @@
 | F11. 気づき/ログ取得 | 判断と学習事項の収集 | records/scratchpad.md、レビュー結果 | findings 更新、ログ | 機密情報を除外 |
 
 ### 5.1 CLI コマンドカタログ(現時点)
-CLI から実行可能とするコマンドを以下に固定する。`task-kit init` と、`task-kit init --copilot` は同一動作の別表記として扱う。
+CLI から実行可能とするコマンドを以下に固定する。`task-kit init` と、`task-kit init --copilot` は同一動作の別表記として扱う。展開先はカレントワークスペースに固定し、`--target` は提供しない。
 
 | コマンド | 目的 | 主入力 | 主出力 | 主更新対象 |
 |---|---|---|---|---|
-| `task-kit init` | キット配布物を現在のワークスペースへ展開 | 上書き方針、`--copilot`(任意・指定時も同一動作) | 展開結果、終了コード | `.github/`, `.task-kit/` |
+| `task-kit init` | キット配布物を現在のワークスペースへ展開 | 上書き方針、`--copilot`(任意・指定時も同一動作)、`--sync` | 展開結果、終了コード | `.github/`, `.task-kit/` |
 
 補足: `--copilot` は省略可能で、指定しても指定しなくても同一の既定動作とする。 他のオプション（例えば `--claude` のような）を作成することを想定した実装とする。
 
@@ -100,7 +101,7 @@ VS Code チャット入力から実行可能とするコマンドを以下に固
 | `/task-kit.task-update` | タスク定義を更新 | タスクパス(任意)、変更要求 | 更新済み task.md、差分要約 | `task.md`, `records/findings.md` |
 | `/task-kit.plan-update` | 実行計画を更新 | タスクパス(任意)、依存、制約 | 更新済み plan.md | `plan.md`, `records/scratchpad.md` |
 | `/task-kit.task-execute` | プラン実行支援と記録更新 | タスクパス(任意)、対象ステップ | 実行ログ、進捗更新 | `plan.md`, `records/*`, `outputs/` |
-| `/task-kit.review` | レビュー実行支援 | タスクパス(任意)、レビュー対象、観点 | 指摘一覧、修正提案 | `records/findings.md`, `outputs/` |
+| `/task-kit.review` | レビュー実行支援 | タスクパス(任意)、レビュー対象、観点 | 指摘一覧、修正提案 | `records/findings.md` への追記のみ |
 | `/task-kit.issue-consult` | 課題の解決助言 | タスクパス(任意)、課題IDまたは課題記述 | 助言、対応案、優先度提案 | `issue.md`, `records/findings.md` |
 
 ### 5.3 チャットコマンド実行エージェント方針(確定)
@@ -124,12 +125,16 @@ VS Code チャット入力から実行可能とするコマンドを以下に固
 - データ/状態管理:
   - 文書ファイルを正本とし、`tasks/YYYY/MM/DD/NNN-slug` 単位で状態を管理。
   - 状態遷移は「未着手/計画済み/進行中/完了」を最小セットとする。
+  - `/task-kit.new-task` は `未着手`、実行可能な計画を確定した `/task-kit.plan-update` は `計画済み`、初回実行した `/task-kit.task-execute` は `進行中` に更新する。`完了` は `task.md` の「完了確認」節に検証結果と利用者の明示確認を記録した後に、`/task-kit.task-execute` だけが更新する。
+  - review agent は `edit` を利用できるが、`records/findings.md` への追記以外を行わない。
 - 権限/認可:
   - ローカルファイル書き込み権限とネットワーク利用権限を前提。
   - プラン制約(有料プラン必須)を起動時チェックで判定。
 - 例外系/失敗時の扱い:
   - 終了コード0-7を固定し、各エラーに修正例を付与。
   - 予期しない例外は要約メッセージと最小ログ参照先のみ表示。
+  - `--sync` は削除前確認と dry-run を提供しない。`.github/agents/task-kit.*`、`.github/prompts/task-kit.*`、`.github/skills/task-kit-*`、`.task-kit/prompts/task-kit.*`、および `.task-kit/templates/` 配下の既知の Task-Kit 管理テンプレートに限定して削除する。利用者独自テンプレートは保持する。
+  - `.task-kit/current-task.md` と `.task-kit/defaults/user-profile.md` は、`--force` を含めて既存内容を上書きしない。
 
 ## 7. データとインターフェース方針
 - 主なデータ構造:
@@ -227,7 +232,7 @@ TARGET/
     skills/
     prompts/
   .task-kit/
-    templates/
+    templates/                # 利用者独自テンプレートの配置も許可する
     prompts/
   tasks/
     2026/

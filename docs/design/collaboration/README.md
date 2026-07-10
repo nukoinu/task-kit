@@ -7,6 +7,7 @@
 
 ### Design Documents
 - docs/design/task-kit-agent-plugin-design-delta-v1.0.md
+- docs/design/task-kit-template-enhancement-design-delta-v1.0.md
 
 ### Agent Definitions
 - .github/agents/expert-prompt-engineer.agent.md
@@ -31,12 +32,12 @@
 
 ### Prompts
 - .github/prompts/codex-collaboration.prompt.md
-- templates/.task-kit/prompts/task-kit.new-task.prompt.md
-- templates/.task-kit/prompts/task-kit.task-update.prompt.md
-- templates/.task-kit/prompts/task-kit.plan-update.prompt.md
-- templates/.task-kit/prompts/task-kit.task-execute.prompt.md
-- templates/.task-kit/prompts/task-kit.review.prompt.md
-- templates/.task-kit/prompts/task-kit.issue-consult.prompt.md
+- templates/github/prompts/task-kit.new-task.prompt.md
+- templates/github/prompts/task-kit.task-update.prompt.md
+- templates/github/prompts/task-kit.plan-update.prompt.md
+- templates/github/prompts/task-kit.task-execute.prompt.md
+- templates/github/prompts/task-kit.review.prompt.md
+- templates/github/prompts/task-kit.issue-consult.prompt.md
 
 ### Terminology Governance
 - docs/terminology/term-governance.md

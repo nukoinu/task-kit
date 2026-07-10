@@ -28,7 +28,19 @@ async function main(argv) {
   const result = await runInit({
     targetRoot: process.cwd(),
     force: options.force,
+    sync: options.sync,
   });
+
+  for (const operation of result.operations) {
+    console.log(`${operation.type}: ${operation.path} (${operation.result})`);
+  }
+
+  if (result.conflicts.length > 0) {
+    throw new AppError(
+      `既存ファイルと競合しました: ${result.conflicts.join(", ")} (上書きする場合は --force)`,
+      EXIT_CODES.CONFLICT_ERROR,
+    );
+  }
 
   console.log(`展開が完了しました: ${result.targetRoot}`);
   console.log("作成/更新: .github, .task-kit");
@@ -38,6 +50,7 @@ async function main(argv) {
 function parseInitOptions(args) {
   const options = {
     force: false,
+    sync: false,
   };
 
   for (const arg of args) {
@@ -48,6 +61,11 @@ function parseInitOptions(args) {
 
     if (arg === "--force") {
       options.force = true;
+      continue;
+    }
+
+    if (arg === "--sync") {
+      options.sync = true;
       continue;
     }
 
@@ -69,11 +87,12 @@ function printHelp() {
   console.log("Task-Kit CLI");
   console.log("");
   console.log("使い方:");
-  console.log("  task-kit init [--copilot] [--force]");
+  console.log("  task-kit init [--copilot] [--force] [--sync]");
   console.log("");
   console.log("オプション:");
   console.log("  --copilot  task-kit init と同一動作の別名オプション");
   console.log("  --force    既存ファイルがあっても上書きする");
+  console.log("  --sync     廃止された Task-Kit 管理資産を削除する");
 }
 
 process.on("SIGINT", () => {

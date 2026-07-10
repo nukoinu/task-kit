@@ -48,12 +48,17 @@ task-kit init
 
 展開先は、コマンド実行ディレクトリ配下の `.github` と `.task-kit` です。
 
+配布正本は `templates/github/agents/`、`templates/github/prompts/`、
+`templates/.task-kit/templates/tasks/` です。展開先の `.github/`、`.task-kit/`、
+`tasks/` は配布正本ではありません。
+
 ## CLI コマンド
 
-### task-kit init [--copilot] [--force]
+### task-kit init [--copilot] [--force] [--sync]
 
 - `--copilot`: `init` と同一動作の別名オプション
 - `--force`: 既存ファイル競合時に上書き
+- `--sync`: 配布元に存在しない既知の Task-Kit 管理資産を削除する。`.task-kit/templates/` 配下の利用者独自テンプレートには関与しない。
 
 ### 終了コード
 
@@ -138,4 +143,5 @@ task-kit init
 
 - 要件定義: `docs/design/task-kit-requirements-v1.0.md`
 - 設計書: `docs/design/task-kit-solution-design-v1.0.md`
+- テンプレート強化差分設計書: `docs/design/task-kit-template-enhancement-design-delta-v1.0.md`
 - CLI 詳細: `cli/README.md`
