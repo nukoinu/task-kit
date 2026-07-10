@@ -5,6 +5,9 @@
 
 ## Collaboration Primary Sources
 
+### Design Documents
+- docs/design/task-kit-agent-plugin-design-delta-v1.0.md
+
 ### Agent Definitions
 - .github/agents/expert-prompt-engineer.agent.md
 - .github/agents/expert-software-engineer.agent.md
