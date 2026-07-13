@@ -93,7 +93,7 @@ task-kit init [--copilot] [--force] [--sync]
     └── outputs/.gitkeep
 ```
 
-`new-task` は `tasks/YYYY/MM/DD/NNN-slug` を作成し、タスクテンプレート群を複製する。`current-task.md` はタスクパス未指定時の既定参照先であり、新規タスク作成時も利用者の同意がある場合だけ切り替える。`user-profile.md` は初回に確定した担当者を既定値として保存する。
+`new-task` は `tasks/YYYY/MM/DD/NNN-slug` を作成し、タスクテンプレート群を複製する。`current-task.md` はタスクパス未指定時の既定参照先であり、新規タスク作成時も利用者の同意がある場合だけ切り替える。`user-profile.md` は初回に確定した作成者と担当者を既定値として保存し、次回以降に再利用する。
 
 ### 5.3 ディレクトリ境界
 
