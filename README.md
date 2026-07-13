@@ -78,6 +78,8 @@ task-kit init
 ### .github へ展開
 
 - `.github/agents/task-kit.task.agent.md`
+- `.github/agents/task-kit.plan.agent.md`
+- `.github/agents/task-kit.execute.agent.md`
 - `.github/agents/task-kit.review.agent.md`
 - `.github/prompts/task-kit.new-task.prompt.md`
 - `.github/prompts/task-kit.task-update.prompt.md`
@@ -92,6 +94,7 @@ task-kit init
 - `.task-kit/defaults/user-profile.md`
 - `.task-kit/templates/tasks/task.md`
 - `.task-kit/templates/tasks/plan.md`
+- `.task-kit/templates/tasks/review.md`
 - `.task-kit/templates/tasks/issue.md`
 - `.task-kit/templates/tasks/handoff.md`
 - `.task-kit/templates/tasks/records/findings.md`

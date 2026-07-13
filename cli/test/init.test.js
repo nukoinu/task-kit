@@ -33,6 +33,17 @@ test("init は既存ファイルの競合を終了コード5で通知する", as
   assert.equal(await fs.readFile(targetPath, "utf8"), "利用者の変更");
 });
 
+test("init はレビュー仕様テンプレートを展開する", async (context) => {
+  const targetRoot = await createTargetRoot(context);
+
+  const result = runInit(targetRoot);
+  const reviewTemplatePath = path.join(targetRoot, ".task-kit", "templates", "tasks", "review.md");
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(await pathExists(reviewTemplatePath), true);
+  assert.match(await fs.readFile(reviewTemplatePath, "utf8"), /^# レビュー仕様/m);
+});
+
 test("init --force は配布対象を上書きする", async (context) => {
   const targetRoot = await createTargetRoot(context);
   const targetPath = path.join(targetRoot, ".github", "agents", "task-kit.task.agent.md");

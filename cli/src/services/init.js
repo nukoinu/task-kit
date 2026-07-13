@@ -8,6 +8,7 @@ const { AppError } = require("../utils/app-error");
 const KNOWN_TASK_KIT_TEMPLATE_FILES = new Set([
   path.join("tasks", "task.md"),
   path.join("tasks", "plan.md"),
+  path.join("tasks", "review.md"),
   path.join("tasks", "issue.md"),
   path.join("tasks", "handoff.md"),
   path.join("tasks", "records", "findings.md"),
