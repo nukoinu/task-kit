@@ -19,7 +19,7 @@
 
 ### 3.1 対象
 
-- `templates/github/agents/` 配下の `task-kit.task.agent.md` と `task-kit.review.agent.md`
+- `templates/github/agents/` 配下の `task-kit.task.agent.md`、`task-kit.review.agent.md`、`task-kit.plan.agent.md`、`task-kit.execute.agent.md`
 - `templates/github/prompts/` 配下の Task-Kit prompt
 - `templates/.task-kit/templates/tasks/` 配下の `task.md`、`plan.md`、`findings.md`、`handoff.md` および関連雛形
 - `README.md` と `docs/design/collaboration/README.md` の、実在する配布元パスおよび設計書への参照
@@ -67,6 +67,15 @@ review agent がレビューで新たに特定した事実、欠陥、根拠を 
 
 `完了` への遷移は、`task.md` の「完了確認」節にすべての完了条件の検証結果と利用者の明示確認を記録した場合に限る。agent または prompt が、実装・レビュー・成果物生成の終了だけを根拠に完了へ自動遷移させてはならない。
 
+### 4.6 プロンプト作成・実行のセッション分離
+
+計画を作成する会話と、その計画を実行する会話は、会話履歴を共有しない別セッションとして扱う。これは実行環境の会話履歴を技術的に消去または検証する機能ではなく、Task-Kit が利用者へ新規セッションを明示的に案内し、自己完結した入力を提供する運用上の境界である。
+
+- `task-kit.plan` は実行可能な計画を確定したとき、新規セッションの開始を案内し、`実行セッションパッケージ` をコードブロックで出力する。パッケージには `/task-kit.task-execute`、タスクパス、対象ステップ、参照してよい `plan.md`・`issue.md`・補助資料のパス、実行制約、受け入れ条件、検証方法、期待する出力形式を含める。
+- `task-kit.execute` は、`実行セッションパッケージ` を含まない直接の呼出しでは、ファイル作成・更新、状態遷移、外部操作を行わない。必要な一次入力を参照してパッケージを作成し、新規セッションに貼り付けるよう案内して終了する。
+- 新規セッションでパッケージを貼り付けて呼び出された `task-kit.execute` は、パッケージと一次入力を突き合わせた後、既存の複雑度判定、利用者確認、実施、検証、記録の手順へ進む。前セッションの会話履歴や未確定な仮説を根拠にしてはならない。
+- パッケージに含められない入力は、推測で補わず、利用者確認事項または参照ファイルのパスとして明示する。秘密情報、個人情報、他タスクの文脈、会話履歴そのものをパッケージへ含めない。
+
 ## 5. 責務境界
 
 | 領域 | 責務 | 更新主体 |
@@ -79,6 +88,8 @@ review agent がレビューで新たに特定した事実、欠陥、根拠を 
 | `tasks/*/outputs/` | 成果物 | task agent。review agent は編集しない |
 | `tasks/*/records/findings.md` | 確定した事実、判断、懸念と根拠 | task agent、review agent。ただし review agent は追記だけ |
 | `tasks/*/handoff.md` | 再開可能な状態の引継ぎ | task agent または利用者 |
+
+`task-kit.plan` は実行セッションパッケージを生成するが、実行や状態遷移は行わない。`task-kit.execute` はパッケージの入口を検査し、分離されていない直接実行を新セッションへ誘導する。いずれも会話セッションの技術的な生成・消去・真正性の検証は担当しない。
 
 ## 6. 状態遷移
 
@@ -122,6 +133,9 @@ stateDiagram-v2
 6. Plugin、`.task-kit/prompts`、dry-run、削除前確認が追加されていない。
 7. `--sync` が利用者独自テンプレートを削除せず、配布元に存在しない既知の Task-Kit 管理テンプレートだけを削除する。
 8. README と協業索引に記載したテンプレート参照先がリポジトリ内に実在する。
+9. `task-kit.plan` は実行可能な計画の確定時に、自己完結した実行セッションパッケージと新規セッション開始の案内を出力する。
+10. `task-kit.execute` はパッケージなしの直接呼出しで書込み・状態遷移・外部操作をせず、新規セッション用パッケージを出力する。パッケージを含む新規セッションからの呼出しだけが、既存の実行手順へ進む。
+11. 実行セッションパッケージに会話履歴、未確定事項、秘密情報、個人情報、他タスク文脈を含めず、実行に必要な目的、参照先、制約、受け入れ条件、検証方法、出力形式を含める。
 
 ## 10. リスクと未解決事項
 
@@ -132,6 +146,7 @@ stateDiagram-v2
 | リスク | 既知の Task-Kit 管理テンプレートと利用者独自テンプレートを同期処理で誤判定する | CLI は既知の Task-Kit 管理テンプレートだけを削除対象として判定する | 管理 |
 | 未解決 | 既知の Task-Kit 管理テンプレートの識別方式 | 初期実装では配布済みの既知パスを管理し、将来のマニフェスト化は別途判断する | 未解決 |
 | 見送り | Agent Plugin と `.task-kit/prompts` の配布・認識方式 | 本差分の対象外として維持し、再開時は別設計で扱う | 見送り |
+| 制約 | 新規セッションであることを実行環境が技術的に証明できない | パッケージを唯一の実行入口として運用し、利用者への新規セッション案内を明示する | 管理 |
 
 ## 11. 既存文書との関係
 
@@ -145,7 +160,7 @@ stateDiagram-v2
 ### 実装順序
 
 1. `templates/github/agents/` の task agent と review agent に共通運用契約を反映する。review agent には `edit` を付与し、`records/findings.md` への追記以外を禁止する。
-2. `templates/github/prompts/` の各 prompt を、空の current task、不一致時確認、状態遷移、記録先、引継ぎ、ディレクトリ境界で agent と一致させる。
+2. `templates/github/prompts/` の各 prompt を、空の current task、不一致時確認、状態遷移、記録先、引継ぎ、ディレクトリ境界で agent と一致させる。`task-kit.plan-update` と `task-kit.task-execute` は実行セッションパッケージの入出力契約も一致させる。
 3. `templates/.task-kit/templates/tasks/` の `task.md` に「完了確認」節を追加し、`plan.md`、`records/findings.md`、`handoff.md` へ必要項目を追記する。既存見出しは維持する。
 4. CLI 同期処理を、既知の Task-Kit 管理テンプレートだけを削除し、利用者独自テンプレートを保持する実装へ更新する。
 5. README と協業索引の配布元参照と同期契約を更新する。
@@ -159,6 +174,8 @@ stateDiagram-v2
 - review agent が findings を追記でき、`records/findings.md` 以外を編集しないこと。
 - 未検証の完了条件または利用者未確認の状態で `完了` へ遷移せず、利用者確認後に task-execute が更新すること。
 - `task-kit init --sync` が利用者独自テンプレートを保持し、配布元にない既知の Task-Kit 管理テンプレートだけを削除すること。
+- 実行可能な計画を確定した `task-kit.plan` が、新規セッションへの案内と必須項目を含む実行セッションパッケージを出力すること。
+- パッケージなしで直接起動した `task-kit.execute` が書込み・状態遷移・外部操作を行わず、パッケージを出力して停止すること。パッケージを貼り付けた起動では既存の複雑度判定へ進むこと。
 
 ### 実装完了の判断
 
