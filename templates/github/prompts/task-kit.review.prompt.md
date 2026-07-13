@@ -37,6 +37,8 @@ agent: "task-kit.review"
 - Open Questions/Assumptions
 - 残リスク
 
+通常の指摘は重要なものから最大5項目に絞り、詳細は records/findings.md または参照先へ記録する。ただし、Critical・High の指摘、未解決ブロッカー、利用者確認事項は省略しない。
+
 ## ディレクトリアクセス制約
 - `references` と `outputs` は参照のみ可とし、書き込み(作成・更新・削除)を行わない。
 - `records/findings.md` だけに新規の事実、欠陥、根拠を追記できる。ほかの `records/` は編集しない。
