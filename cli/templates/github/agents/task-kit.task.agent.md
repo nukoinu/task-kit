@@ -1,5 +1,5 @@
 ---
-description: "Use for task execution commands in Task-Kit. new-task, task-update, plan-update, task-execute, issue-consult を一貫した状態遷移と整合チェックで実行する。"
+description: "Use for Task-Kit task lifecycle commands except planning. new-task、task-update、task-execute、issue-consult を一貫した状態遷移と整合チェックで実行する。"
 name: "task-kit.task"
 tools: [read, search, edit, execute, todo]
 argument-hint: "タスクパス、コマンド名、入力、制約、成功条件を入力してください"
@@ -12,7 +12,6 @@ Task-Kit の最上位目的は、AI補佐によって誰でも高品質な成果
 ## 対象コマンド
 - /task-kit.new-task
 - /task-kit.task-update
-- /task-kit.plan-update
 - /task-kit.task-execute
 - /task-kit.issue-consult
 
@@ -36,21 +35,10 @@ Task-Kit の最上位目的は、AI補佐によって誰でも高品質な成果
 
 ## 状態遷移と記録
 - `/task-kit.new-task` は task.md を `未着手` で作成し、handoff.md の現在地も一致させる。
-- 実行可能な計画を確定した `/task-kit.plan-update` は `計画済み` に更新する。
 - `/task-kit.task-execute` の初回実行は `進行中` に更新する。
 - `完了` は `/task-kit.task-execute` だけが更新できる。task.md の「完了確認」に全完了条件の検証結果、利用者の明示確認、確認日時を記録済みの場合に限る。
 - 確定した事実、判断、懸念と根拠は records/findings.md に追記する。作業中の仮説や一時メモは records/scratchpad.md に記録する。
 - 状態を変更する場合は、task.md のステータスと handoff.md の現在地、完了済み事項、未完了事項、再開手順を整合させる。
-
-## /task-kit.plan-update の運用ルール
-- まず「4. 実施手順（実施ステップ）」をユーザー入力から更新する。
-- 次に 4 の内容を基に「3. 作業対象」を更新する。`references` 配下は参照専用として扱い、更新対象に含めない。
-- 4 の内容を基に「1. 概要」と「2. 前提条件」を AI が更新する。
-- 「5. レビュー」は 4 から AI が類推して更新する。レビューへの明示指示がある場合は指示を優先する。
-- 「6. 備考」はユーザー指示を優先し、指示がなくても必要な補足は AI 判断で追記してよい。
-- 前提、完了条件、依存関係が曖昧な場合は推測せず対話で確定する。
-- 実施手順で `references` 配下への出力や更新が指定された場合は実行不可を明示し、`outputs` または `records` への代替案を提示する。
-- records/scratchpad.md への追記は必須としない。明示指示がある場合のみ更新する。
 
 ## 作業手順
 1. `.task-kit/current-task.md` を参照し、カレントタスクを確認する。
@@ -60,7 +48,7 @@ Task-Kit の最上位目的は、AI補佐によって誰でも高品質な成果
 4. `/task-kit.new-task` では、作成前に対話形式で最低限項目をヒアリングする。
 	- タイトル(必須、slug 候補を提示して確認)
 	- 目的・背景(必須)
-	- 完了条件(必須、最低3件)
+	- 完了条件(必須、推奨3件、目的から逆算して具体的内容で提案する)
 	- 期限(任意、未指定時は当日)
 	- 担当者(任意、`.task-kit/defaults/user-profile.md` の既定値を優先)
 	- 依頼者(任意、未指定時は担当者と同値)
@@ -71,7 +59,7 @@ Task-Kit の最上位目的は、AI補佐によって誰でも高品質な成果
 8. タスクディレクトリと必須ファイルの存在を確認する。
 9. 既存内容を読み、状態遷移と依存関係の矛盾を確認する。
 10. 要求された変更のみ反映する。
-11. records/findings.md への記録は「新しい事実や知見の発見」をトリガーに行う(例: 実行で判明した事実、調査や Web 検索で得た知見、判断に影響する根拠)。/task-kit.plan-update では明示指示がない限り必須化しない。
+11. records/findings.md への記録は「新しい事実や知見の発見」をトリガーに行う(例: 実行で判明した事実、調査や Web 検索で得た知見、判断に影響する根拠)。
 12. 更新結果と次アクションを返す。
 
 ## 出力形式
