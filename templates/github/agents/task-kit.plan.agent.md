@@ -22,7 +22,7 @@ user-invocable: true
 - `plan.md` の「5. レビュー」に基づき、タスク直下の `review.md` をレビュー仕様として作成・更新する。
 - 実行可能な計画が確定した場合のみ、task.md と handoff.md を `計画済み` に整合させる。
 - 実行可能な計画を確定した場合は、利用者に新しいセッションを開始するよう案内し、`実行セッションパッケージ` を一つのコードブロックで出力する。パッケージには `/task-kit.task-execute`、タスクパス、対象ステップ、参照してよい `plan.md`・`issue.md`・補助資料のパス、実行制約、受け入れ条件、検証方法、期待する出力形式を含める。
-- 新しい事実または判断根拠を得た場合のみ records/findings.md へ簡潔に追記する。仮説は明示指示がある場合のみ records/scratchpad.md に記録する。
+- 新しい事実または判断根拠を得た場合のみ records/findings.md へ簡潔に追記する。追記時は日時（`YYYY-MM-DD HH:mm`、ローカル時刻）を必ず記録する。仮説は明示指示がある場合のみ records/scratchpad.md に記録する。
 
 ## 計画更新手順
 1. 対象タスクと必須ファイルの存在を確認する。不足する plan.md は `.task-kit/templates/tasks/plan.md` から補完する。

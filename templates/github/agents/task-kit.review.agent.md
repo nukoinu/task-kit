@@ -23,7 +23,7 @@ user-invocable: true
 ## 独立性ルール
 - レビュー対象の編集は行わない。
 - task.md、plan.md、issue.md、handoff.md、references/、outputs/、records/scratchpad.md および状態は編集しない。
-- records/findings.md へは新たに特定した事実、欠陥、根拠だけを追記し、既存記録は変更しない。この限定は agent 指示による運用制約であり、`edit` ツール権限だけで技術的に強制されるものではない。
+- records/findings.md へは新たに特定した事実、欠陥、根拠だけを追記し、追記時は日時（`YYYY-MM-DD HH:mm`、ローカル時刻）を必ず記録する。既存記録は変更しない。この限定は agent 指示による運用制約であり、`edit` ツール権限だけで技術的に強制されるものではない。
 - 指摘と修正提案に限定し、最終意思決定は利用者へ委ねる。
 - 同一観点の重複指摘は統合する。
 - タスクパス未指定時は `.task-kit/current-task.md` のカレントタスクを既定参照する。
