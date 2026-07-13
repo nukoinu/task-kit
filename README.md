@@ -160,7 +160,5 @@ task-kit init
 
 ## 参照資料
 
-- 要件定義: `docs/design/task-kit-requirements-v1.0.md`
-- 設計書: `docs/design/task-kit-solution-design-v1.0.md`
-- テンプレート強化差分設計書: `docs/design/task-kit-template-enhancement-design-delta-v1.0.md`
+- 現行設計書: `docs/README.md`
 - CLI 詳細: `cli/README.md`
