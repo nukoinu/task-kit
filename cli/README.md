@@ -26,7 +26,7 @@ node src/index.js init
 リリースアセットの `.tgz` を使ってグローバルインストールできる。
 
 ```powershell
-npm install -g https://github.com/<OWNER>/<REPO>/releases/download/v0.2.0/task-kit-cli-0.2.0.tgz
+npm install -g https://github.com/<OWNER>/<REPO>/releases/download/v0.5.0/task-kit-cli-0.5.0.tgz
 task-kit init
 ```
 
