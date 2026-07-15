@@ -85,6 +85,29 @@ test("実行セッションパッケージは Codex と Claude Code の呼び出
   assert.match(executeSkill, /\/task-kit\.task-execute/);
 });
 
+test("実行セッションパッケージはスラッシュコマンドをコードブロックの先頭行に置く", async () => {
+  const planPrompt = await readNormalized(
+    path.join(repositoryRoot, "templates", "github", "prompts", "task-kit.plan-update.prompt.md"),
+  );
+  const executePrompt = await readNormalized(
+    path.join(repositoryRoot, "templates", "github", "prompts", "task-kit.task-execute.prompt.md"),
+  );
+
+  assert.match(planPrompt, /コードブロックの先頭行を `\/task-kit\.task-execute`/);
+  assert.doesNotMatch(planPrompt, /コードブロックの先頭行は `## 実行セッションパッケージ`/);
+  assert.match(executePrompt, /先頭行が `\/task-kit\.task-execute` のコードブロック/);
+});
+
+test("task-execute の直接呼出しは不足入力を同じセッションで確認する", async () => {
+  const executeAgent = await readNormalized(
+    path.join(repositoryRoot, "templates", "github", "agents", "task-kit.execute.agent.md"),
+  );
+
+  assert.match(executeAgent, /直接の呼出しも有効な実行開始として受理する/);
+  assert.match(executeAgent, /現在のセッションで不足事項だけをまとめて利用者へ確認する/);
+  assert.doesNotMatch(executeAgent, /直接の呼出しでは[^\n]*新しいセッションを開始/);
+});
+
 function extractContract(content, id) {
   const start = `<!-- task-kit-parity:${id}:start -->`;
   const end = `<!-- task-kit-parity:${id}:end -->`;
