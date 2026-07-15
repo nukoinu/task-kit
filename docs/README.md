@@ -2,7 +2,7 @@
 
 ## 1. 目的と適用範囲
 
-Task-Kit は、VS Code ワークスペースで再現可能なタスク遂行フローを提供する配布キットである。Node.js CLI がワークスペースへエージェント定義、チャット用プロンプト、タスク運用テンプレートを展開する。
+Task-Kit は、GitHub Copilot、Codex、Claude Code で再現可能なタスク遂行フローを提供する配布キットである。Node.js CLI が製品別の実行資産と共通タスクテンプレートを展開する。
 
 本書はリポジトリの現行実装と `templates/` を根拠にした配布仕様である。過去の要件定義、差分設計、用語運用の経緯は対象外とする。
 
@@ -11,36 +11,42 @@ Task-Kit は、VS Code ワークスペースで再現可能なタスク遂行フ
 | 正本 | 責務 |
 |---|---|
 | `templates/github/` | `.github/agents` と `.github/prompts` に展開する資産 |
+| `templates/skills/` | `.agents/skills` と `.claude/skills` に展開する、`.github` 非依存の Agent Skills |
+| `templates/codex/AGENTS.md` | Codex 用の Task-Kit 管理コメント区間 |
+| `templates/claude/CLAUDE.md` | Claude Code 用の Task-Kit 管理コメント区間 |
 | `templates/.task-kit/` | `.task-kit` に展開する既定ファイルとタスクテンプレート |
-| `cli/src/` | `init` の引数解釈、展開、競合・同期削除、安全性検査 |
+| `cli/src/` | `init` / `switch` の引数解釈、展開、競合・同期削除、安全性検査 |
 | `cli/test/` | CLI の展開・競合・同期・シンボリックリンク安全性の回帰検証 |
 
-展開先の `.github/`、`.task-kit/`、`tasks/` は利用者ワークスペースの状態であり、配布正本ではない。
+展開先の `.github/`、`.agents/`、`.claude/`、`.task-kit/`、`tasks/` は利用者ワークスペースの状態であり、配布正本ではない。
 
 ## 3. 前提条件
 
 - Node.js 22.x
-- VS Code 1.102 以上
 - Windows または macOS
-- GitHub Copilot の有料プランとネットワーク接続
+- GitHub Copilot、Codex、Claude Code のうち利用対象となる実行環境
 
 ## 4. CLI
 
 ### 4.1 コマンド
 
 ```text
-task-kit init [--copilot] [--force] [--sync]
+task-kit init [--copilot|--codex|--claude] [--force] [--sync]
+task-kit switch [--copilot-to-codex|--copilot-to-claude] [--force] [--sync]
 ```
 
-- `--copilot` は `init` と同じ動作を表す互換オプション。
+- `--copilot` は既定の Copilot 展開、`--codex` と `--claude` は製品別 skills 展開を選択する。
 - `--force` は既存の配布管理ファイルを上書きする。
-- `--sync` は配布元にない既知の Task-Kit 管理資産を削除する。
+- `--sync` は選択製品で配布元にない既知の Task-Kit 管理資産を削除する。
+- `switch` は移行先の展開成功後だけ Copilot の Task-Kit 管理資産を削除する。
 
-展開先は実行時カレントディレクトリ直下の `.github` と `.task-kit` である。任意の展開先を指定するオプションはない。
+展開先は実行時カレントディレクトリ直下の製品別ディレクトリと `.task-kit` である。任意の展開先を指定するオプションはない。
 
 ### 4.2 競合と同期
 
 通常の `init` は、既存の配布対象ファイルを検出すると終了コード `5` で終了し、上書きしない。`--force` 指定時だけ上書きする。
+
+既存の `AGENTS.md` / `CLAUDE.md` は競合扱いにせず、Task-Kit 管理コメント区間を末尾へ追記する。既存の管理区間を `--force` で更新する場合も、区間外の利用者記述は保持する。
 
 `--sync` は、`task-kit.` 接頭辞を持つ既知のエージェント・プロンプト・スキル、および既知のタスクテンプレートだけを削除対象とする。利用者が追加したテンプレート、`tasks/`、`current-task.md`、`user-profile.md`、Task-Kit 管理対象外の資産は保持する。`--sync` 単独では競合ファイルを上書きせず、廃止資産の削除後に終了コード `5` を返す。`--force --sync` は上書きと削除の両方を行う。
 
@@ -61,7 +67,7 @@ task-kit init [--copilot] [--force] [--sync]
 
 ## 5. 展開資産
 
-### 5.1 エージェントとプロンプト
+### 5.1 製品別実行資産
 
 | 役割 | エージェント | プロンプト |
 |---|---|---|
@@ -72,7 +78,11 @@ task-kit init [--copilot] [--force] [--sync]
 
 標準フローは `new-task` / `task-update` → `plan-update` → `task-execute` → `review` である。`issue-consult` は課題の整理と対応案の検討に使う。
 
-計画の確定後、`plan-update` は参照先中心の「実行セッションパッケージ」を提示し、利用者は新しいセッションで `task-execute` を開始する。パッケージの先頭行は `## 実行セッションパッケージ`、次行は `/task-kit.task-execute` とし、タスクパス、依存関係が明確な連続ステップ群、一次入力と補助資料の参照先、追加制約、検証差分だけを含む。この固定形式を満たすパッケージは有効な初回パッケージとして受理し、再作成しない。初回パッケージなしの直接実行は書込み・状態遷移・外部操作をせず、パッケージの作成と新規セッションの案内だけを行う。パッケージがある実行では、書込み前に複雑度、必要な検証、推奨するモデル層を提示し、利用者確認を得る。同一セッション内では、対象範囲と一次入力に実質的な変更がない限り、次の対象ステップを継続実行できる。
+Codex / Claude Code では `task-kit-task`、`task-kit-plan`、`task-kit-execute`、`task-kit-review` の Agent Skills を同じ責務境界で配布する。各 skill は対応する Copilot agent 本文と command prompt 本文を静的な自己完結契約として保持する。製品差分は呼び出し記法、添付参照、agent 委譲の skill 呼び出しへの読み替えだけとし、手順、停止条件、状態遷移、出力契約は省略しない。展開後の skill は別製品のテンプレートを実行時に参照しない。
+
+`cli/test/skill-parity.test.js` は Copilot agent・prompt の frontmatter を除く契約本文が各 skill の対応区間と一致することを検証する。Copilot 側の契約を変更した場合は、対応 skill も同じ変更で更新しなければテストを失敗させる。
+
+計画の確定後、計画担当は参照先中心の「実行セッションパッケージ」を提示し、利用者は新しいセッションで製品に対応した `task-kit-execute` 呼び出しを開始する。パッケージにはタスクパス、依存関係が明確な連続ステップ群、一次入力の参照先、追加制約、検証差分だけを含める。初回パッケージなしの直接実行は書込み・状態遷移・外部操作をせず、パッケージ作成と新規セッション案内だけを行う。
 
 ### 5.2 タスク領域
 
@@ -136,8 +146,8 @@ npm test
 npm run check
 ```
 
-テストは、全テンプレートの展開、競合時の非上書き、`--force`、`--sync` の削除範囲、利用者資産の保持、既知の廃止テンプレート、シンボリックリンク拒否、未知オプションを検証する。
+テストは、製品別テンプレートの展開、Copilot と skills の契約同等性、instruction file への追記、移行、競合時の非削除、`--force`、`--sync` の削除範囲、利用者資産の保持、シンボリックリンク拒否、未知オプションを検証する。
 
 ## 9. 設計上の未解決事項
 
-現行実装から判断できる未解決の設計事項はない。将来のコマンド追加、展開先指定、オフライン運用、Agent Plugin 化は本書の対象外であり、採用する場合は実装に先立ち設計決定を行う。
+現行実装から判断できる未解決の設計事項はない。将来の展開先指定、双方向移行、オフライン運用、Agent Plugin 化は本書の対象外であり、採用する場合は実装に先立ち設計決定を行う。

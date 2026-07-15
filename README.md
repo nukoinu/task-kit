@@ -1,25 +1,26 @@
 # Task-Kit
 
-Task-Kit は、VS Code workspace でタスク遂行フローを再現可能にするための配布キットです。
-CLI で `.github` と `.task-kit` の運用資産を展開し、VS Code から利用するエージェント定義、プロンプト、テンプレートを配布します。
+Task-Kit は、AI coding agent を使ったタスク遂行フローを再現可能にするための配布キットです。
+CLI で GitHub Copilot、Codex、Claude Code 向けの実行資産と、共通の `.task-kit` テンプレートを配布します。
 
 ## できること
 
-- `task-kit init` による配布物展開
+- `task-kit init` による製品別配布物の展開
+- `task-kit switch` による Copilot から Codex / Claude Code への移行
 - `.github` 配下へのエージェント定義とプロンプトの展開
+- `.agents/skills` または `.claude/skills` 配下への独立した Agent Skills の展開
 - `.task-kit` 配下へのタスク運用テンプレートと既定ファイルの展開
 - タスク管理、計画、実行、独立レビューの役割を分離したエージェント構成の配布
 - タスク作成、プラン更新、実行、レビューなどの運用フローを支えるチャット用プロンプトの配布
 
-現時点で CLI から実行できるコマンドは `task-kit init` のみです。タスク作成、更新、レビューなどの運用フローは、展開されるプロンプトとテンプレートで支援します。
+CLI は `task-kit init` と `task-kit switch` を提供します。タスク作成、更新、レビューなどの運用フローは、展開されるプロンプト、skills、テンプレートで支援します。
 
 ## 前提条件
 
 - OS: Windows または macOS
-- VS Code: 1.102 以上
 - Node.js: 22.x(推奨: 22 LTS)
 - ネットワーク接続: 必須(オフライン運用は対象外)
-- GitHub Copilot 有料プラン: 必須(無料プランは対象外)
+- 利用対象に応じて GitHub Copilot、Codex、Claude Code の実行環境
 
 ## クイックスタート
 
@@ -40,26 +41,32 @@ node src/index.js init
 GitHub Releases から直接インストールする場合:
 
 ```powershell
-npm install -g https://github.com/<OWNER>/<REPO>/releases/download/v0.1.0/task-kit-cli-0.1.0.tgz
+npm install -g https://github.com/<OWNER>/<REPO>/releases/download/v0.2.0/task-kit-cli-0.2.0.tgz
 task-kit init
 ```
 
 補足: GitHub Release を publish すると、`Release CLI Asset` ワークフローが
 `.tgz` アセットを自動添付する。
 
-展開先は、コマンド実行ディレクトリ配下の `.github` と `.task-kit` です。
+展開先は製品に応じて `.github`、`.agents/skills`、`.claude/skills` のいずれかと、共通の `.task-kit` です。Codex ではルートの `AGENTS.md`、Claude Code では `CLAUDE.md` も管理コメント付きで作成または追記します。
 
-配布正本は `templates/github/agents/`、`templates/github/prompts/`、
-`templates/.task-kit/templates/tasks/` です。展開先の `.github/`、`.task-kit/`、
-`tasks/` は配布正本ではありません。
+配布正本は `templates/github/`、`templates/skills/`、`templates/codex/`、
+`templates/claude/`、`templates/.task-kit/` です。`templates/skills/` は `.github` を参照しない
+Codex / Claude Code 共通の Agent Skills 正本です。
 
 ## CLI コマンド
 
-### task-kit init [--copilot] [--force] [--sync]
+### task-kit init [--copilot|--codex|--claude] [--force] [--sync]
 
-- `--copilot`: `init` と同一動作の別名オプション
+- `--copilot`: GitHub Copilot 用資産を展開。`init` の既定値
+- `--codex`: `.agents/skills` と `AGENTS.md` を展開
+- `--claude`: `.claude/skills` と `CLAUDE.md` を展開
 - `--force`: 既存ファイル競合時に上書き
-- `--sync`: 配布元に存在しない既知の Task-Kit 管理資産を削除する。`.task-kit/templates/` 配下の利用者独自テンプレートには関与しない。
+- `--sync`: 選択製品で配布元に存在しない既知の Task-Kit 管理資産を削除する。利用者独自資産には関与しない
+
+### task-kit switch [--copilot-to-codex|--copilot-to-claude] [--force] [--sync]
+
+移行先資産の展開に成功した後、`.github` 内の Task-Kit 管理エージェント、プロンプト、skills だけを削除します。他製品の `.github` 資産と `.task-kit` の利用者状態は保持します。
 
 ### 終了コード
 
@@ -89,9 +96,17 @@ task-kit init
 - `.github/prompts/task-kit.review.prompt.md`
 - `.github/prompts/task-kit.issue-consult.prompt.md`
 
+### Codex / Claude Code へ展開
+
+- Codex: `.agents/skills/task-kit-{task,plan,execute,review}/SKILL.md` と `AGENTS.md`
+- Claude Code: `.claude/skills/task-kit-{task,plan,execute,review}/SKILL.md` と `CLAUDE.md`
+
+両製品の skills は `templates/skills` を正本とし、Copilot の `.github` 資産を参照しません。
+各 skill には対応する Copilot agent と prompt の実行契約を省略せず格納し、製品差分は呼び出し記法と添付ファイルの読み方だけに限定します。`cli/test/skill-parity.test.js` は agent・prompt の契約本文と skills の一致を検証し、片側だけの変更を失敗として検出します。
+
 ### エージェントの構成
 
-展開される 4 つの専任エージェントは、チャット用プロンプトから呼び出されます。役割を分離することで、タスク定義、計画、実行、レビューを混在させずに運用できます。
+Copilot では 4 つの専任エージェントをチャット用プロンプトから呼び出します。Codex / Claude Code では同じ責務境界を 4 つの skills として提供します。
 
 | エージェント | 主な責務 | 関連プロンプト |
 |---|---|---|
@@ -102,7 +117,7 @@ task-kit init
 
 標準フローは、`new-task` / `task-update` → `plan-update` → `task-execute` → `review` です。`issue-consult` は課題の整理・対応案の検討に利用します。
 
-`/task-kit.plan-update` で実行可能な計画を確定した後は、先頭行が `## 実行セッションパッケージ`、次行が `/task-kit.task-execute` の参照先中心パッケージを新しいセッションに貼り付けて実行します。パッケージは依存関係が明確な連続ステップ群を対象にし、同一セッション内では対象範囲と一次入力に実質的な変更がない限り継続実行できます。実行前には対象ステップ群の複雑度に応じたモデル層の推奨と利用者確認を行います。
+実行可能な計画を確定した後は、`task-kit-execute` を明示した参照先中心の実行セッションパッケージを新しいセッションに貼り付けます。Copilot は `/task-kit.task-execute`、Codex は `$task-kit-execute`、Claude Code は `/task-kit-execute` で開始します。
 
 ### .task-kit へ展開
 
@@ -118,7 +133,7 @@ task-kit init
 - `.task-kit/templates/tasks/references/.gitkeep`
 - `.task-kit/templates/tasks/outputs/.gitkeep`
 
-## 同梱されるチャット用プロンプト
+## 同梱されるワークフロー
 
 - `/task-kit.new-task`
 - `/task-kit.task-update`
@@ -127,7 +142,7 @@ task-kit init
 - `/task-kit.review`
 - `/task-kit.issue-consult`
 
-これらは `.github/prompts` と関連テンプレートとして展開され、VS Code 上の運用フローを支援します。CLI サブコマンドとしてはまだ実装していません。
+Copilot では `.github/prompts`、Codex / Claude Code では `task-kit-task`、`task-kit-plan`、`task-kit-execute`、`task-kit-review` skills として同等の役割を配布します。skills は `.github` のファイルを実行時に参照しません。
 
 ## 含まれる運用ルールの例
 

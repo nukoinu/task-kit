@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 
-const path = require("node:path");
-
 const { EXIT_CODES } = require("./exit-codes");
-const { runInit } = require("./services/init");
+const { runInit, runSwitch } = require("./services/init");
 const { AppError } = require("./utils/app-error");
 
 async function main(argv) {
@@ -16,20 +14,28 @@ async function main(argv) {
 
   const command = args[0];
   const commandArgs = args.slice(1);
+  let result;
 
-  if (command !== "init") {
-    throw new AppError(
-      `不明なコマンドです: ${command}`,
-      EXIT_CODES.INPUT_ERROR,
-    );
+  if (command === "init") {
+    const options = parseInitOptions(commandArgs);
+    result = await runInit({
+      targetRoot: process.cwd(),
+      product: options.product,
+      force: options.force,
+      sync: options.sync,
+    });
+  } else if (command === "switch") {
+    const options = parseSwitchOptions(commandArgs);
+    result = await runSwitch({
+      targetRoot: process.cwd(),
+      fromProduct: "copilot",
+      toProduct: options.toProduct,
+      force: options.force,
+      sync: options.sync,
+    });
+  } else {
+    throw new AppError(`不明なコマンドです: ${command}`, EXIT_CODES.INPUT_ERROR);
   }
-
-  const options = parseInitOptions(commandArgs);
-  const result = await runInit({
-    targetRoot: process.cwd(),
-    force: options.force,
-    sync: options.sync,
-  });
 
   for (const operation of result.operations) {
     console.log(`${operation.type}: ${operation.path} (${operation.result})`);
@@ -42,44 +48,77 @@ async function main(argv) {
     );
   }
 
-  console.log(`展開が完了しました: ${result.targetRoot}`);
-  console.log("作成/更新: .github, .task-kit");
+  if (command === "switch") {
+    console.log(`移行が完了しました: copilot -> ${result.product}`);
+  } else {
+    console.log(`展開が完了しました: ${result.targetRoot}`);
+    console.log(`対象製品: ${result.product}`);
+  }
   return EXIT_CODES.SUCCESS;
 }
 
 function parseInitOptions(args) {
-  const options = {
-    force: false,
-    sync: false,
-  };
+  const options = { product: "copilot", force: false, sync: false };
+  let productSpecified = false;
 
   for (const arg of args) {
-    if (arg === "--copilot") {
-      // --copilot は現時点ではデフォルト動作と同じ別名。
+    if (["--copilot", "--codex", "--claude"].includes(arg)) {
+      if (productSpecified) {
+        throw new AppError("製品オプションは一つだけ指定してください。", EXIT_CODES.INPUT_ERROR);
+      }
+      options.product = arg.slice(2);
+      productSpecified = true;
       continue;
     }
-
     if (arg === "--force") {
       options.force = true;
       continue;
     }
-
     if (arg === "--sync") {
       options.sync = true;
       continue;
     }
-
     if (arg === "-h" || arg === "--help") {
       printHelp();
       process.exit(EXIT_CODES.SUCCESS);
     }
+    throw new AppError(`不明なオプションです: ${arg}`, EXIT_CODES.INPUT_ERROR);
+  }
+  return options;
+}
 
+function parseSwitchOptions(args) {
+  const options = { toProduct: null, force: false, sync: false };
+
+  for (const arg of args) {
+    if (arg === "--copilot-to-codex" || arg === "--copilot-to-claude") {
+      if (options.toProduct) {
+        throw new AppError("移行オプションは一つだけ指定してください。", EXIT_CODES.INPUT_ERROR);
+      }
+      options.toProduct = arg.endsWith("codex") ? "codex" : "claude";
+      continue;
+    }
+    if (arg === "--force") {
+      options.force = true;
+      continue;
+    }
+    if (arg === "--sync") {
+      options.sync = true;
+      continue;
+    }
+    if (arg === "-h" || arg === "--help") {
+      printHelp();
+      process.exit(EXIT_CODES.SUCCESS);
+    }
+    throw new AppError(`不明なオプションです: ${arg}`, EXIT_CODES.INPUT_ERROR);
+  }
+
+  if (!options.toProduct) {
     throw new AppError(
-      `不明なオプションです: ${arg}`,
+      "移行オプション --copilot-to-codex または --copilot-to-claude を指定してください。",
       EXIT_CODES.INPUT_ERROR,
     );
   }
-
   return options;
 }
 
@@ -87,12 +126,17 @@ function printHelp() {
   console.log("Task-Kit CLI");
   console.log("");
   console.log("使い方:");
-  console.log("  task-kit init [--copilot] [--force] [--sync]");
+  console.log("  task-kit init [--copilot|--codex|--claude] [--force] [--sync]");
+  console.log("  task-kit switch [--copilot-to-codex|--copilot-to-claude] [--force] [--sync]");
   console.log("");
   console.log("オプション:");
-  console.log("  --copilot  task-kit init と同一動作の別名オプション");
-  console.log("  --force    既存ファイルがあっても上書きする");
-  console.log("  --sync     廃止された Task-Kit 管理資産を削除する");
+  console.log("  --copilot            GitHub Copilot 用資産を展開する (init の既定値)");
+  console.log("  --codex              Codex 用資産を展開する");
+  console.log("  --claude             Claude Code 用資産を展開する");
+  console.log("  --copilot-to-codex   Copilot 用 Task-Kit 資産を Codex 用へ移行する");
+  console.log("  --copilot-to-claude  Copilot 用 Task-Kit 資産を Claude Code 用へ移行する");
+  console.log("  --force              既存の Task-Kit 管理資産を上書きする");
+  console.log("  --sync               選択製品の廃止済み Task-Kit 管理資産を削除する");
 }
 
 process.on("SIGINT", () => {
@@ -110,8 +154,6 @@ main(process.argv)
       process.exitCode = error.exitCode;
       return;
     }
-
     console.error(`[error:${EXIT_CODES.INTERNAL_ERROR}] 予期しないエラーが発生しました。`);
-    console.error(error && error.message ? error.message : String(error));
     process.exitCode = EXIT_CODES.INTERNAL_ERROR;
   });
