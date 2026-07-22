@@ -98,15 +98,15 @@ Codex / Claude Code 共通の Agent Skills 正本です。
 
 ### Codex / Claude Code へ展開
 
-- Codex: `.agents/skills/task-kit-{task,plan,execute,review}/SKILL.md` と `AGENTS.md`
-- Claude Code: `.claude/skills/task-kit-{task,plan,execute,review}/SKILL.md` と `CLAUDE.md`
+- Codex: `.agents/skills/task-kit-{new-task,task-update,plan-update,task-execute,review,issue-consult}/SKILL.md` と `AGENTS.md`
+- Claude Code: `.claude/skills/task-kit-{new-task,task-update,plan-update,task-execute,review,issue-consult}/SKILL.md` と `CLAUDE.md`
 
 両製品の skills は `templates/skills` を正本とし、Copilot の `.github` 資産を参照しません。
 各 skill には対応する Copilot agent と prompt の実行契約を省略せず格納し、製品差分は呼び出し記法と添付ファイルの読み方だけに限定します。`cli/test/skill-parity.test.js` は agent・prompt の契約本文と skills の一致を検証し、片側だけの変更を失敗として検出します。
 
 ### エージェントの構成
 
-Copilot では 4 つの専任エージェントをチャット用プロンプトから呼び出します。Codex / Claude Code では同じ責務境界を 4 つの skills として提供します。
+Copilot では 4 つの専任エージェントをチャット用プロンプトから呼び出します。Codex / Claude Code では6つの論理操作を一つずつ skill として提供します。
 
 | エージェント | 主な責務 | 関連プロンプト |
 |---|---|---|
@@ -117,7 +117,7 @@ Copilot では 4 つの専任エージェントをチャット用プロンプト
 
 標準フローは、`new-task` / `task-update` → `plan-update` → `task-execute` → `review` です。`issue-consult` は課題の整理・対応案の検討に利用します。
 
-実行可能な計画を確定した後は、`task-kit-execute` を明示した参照先中心の実行セッションパッケージを新しいセッションに貼り付けます。Copilot は `/task-kit.task-execute`、Codex は `$task-kit-execute`、Claude Code は `/task-kit-execute` で開始します。
+実行可能な計画を確定した後は、`task-kit-task-execute` を明示した参照先中心の実行セッションパッケージを新しいセッションに貼り付けます。Copilot は `/task-kit.task-execute`、Codex は `$task-kit-task-execute`、Claude Code は `/task-kit-task-execute` で開始します。
 
 ### .task-kit へ展開
 
@@ -142,7 +142,9 @@ Copilot では 4 つの専任エージェントをチャット用プロンプト
 - `/task-kit.review`
 - `/task-kit.issue-consult`
 
-Copilot では `.github/prompts`、Codex / Claude Code では `task-kit-task`、`task-kit-plan`、`task-kit-execute`、`task-kit-review` skills として同等の役割を配布します。skills は `.github` のファイルを実行時に参照しません。
+Copilot では `.github/prompts`、Codex / Claude Code では `task-kit-new-task`、`task-kit-task-update`、`task-kit-plan-update`、`task-kit-task-execute`、`task-kit-review`、`task-kit-issue-consult` skills として同等の役割を配布します。skills は `.github` のファイルを実行時に参照しません。
+
+製品ごとに呼び出し記法は異なりますが、同じ6論理操作に対応します。例: Copilot は `/task-kit.new-task`、Claude Code は `/task-kit-new-task`、Codex は `$task-kit-new-task` です。
 
 ## 含まれる運用ルールの例
 

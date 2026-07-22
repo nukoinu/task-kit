@@ -53,6 +53,7 @@ GitHub Release 公開時は `.github/workflows/release-cli.yml` により、
 - `--force`: 既存ファイル競合時に上書きする。
 - `--sync`: 選択製品で配布元に存在しない Task-Kit 管理資産を削除する。削除前確認は行わない。
 - 共通展開先: カレントディレクトリ配下の `.task-kit`。
+- 共通でルート `.markdownlint.jsonc` を配布する。既存設定は通常時に競合として扱い、`--force` のときだけ更新する。
 
 既存 `AGENTS.md` / `CLAUDE.md` には、製品別の Task-Kit 管理コメントで囲んだ区間を末尾へ追記する。`--force` は管理区間だけを更新し、利用者が記述した他の内容を変更しない。
 
@@ -70,6 +71,10 @@ Task-Kit 接頭辞を持たない資産と同様に保持する。
 `--sync` 単独では既存の配布対象を上書きしない。競合したファイルを表示し、
 廃止資産の削除を実行したうえで終了コード `5` を返す。`--force --sync` は
 上書きと削除を実行する。`current-task.md` と `user-profile.md` は `--force` 指定時も保持する。
+
+### `task-kit lint [--fix] [paths...]`
+
+Task-Kit が配布した `.markdownlint.jsonc` を使用して Markdown を検査する。パス未指定時はリポジトリ内の Markdown を `.git`、`node_modules`、生成物を除外して検査する。指定時はリポジトリ内の既存 Markdown ファイルだけを受け付ける。`--fix` は markdownlint-cli2 の安全な自動修正だけを適用し、違反が残れば終了コード `4` を返す。シンボリックリンクを経由する対象は拒否する。
 
 ## 終了コード
 

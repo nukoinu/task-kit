@@ -7,21 +7,27 @@ const repositoryRoot = path.resolve(__dirname, "..", "..");
 
 const parityCases = [
   {
-    skill: "task-kit-task",
+    skill: "task-kit-new-task",
     agent: "task-kit.task.agent.md",
-    prompts: {
-      "new-task": "task-kit.new-task.prompt.md",
-      "task-update": "task-kit.task-update.prompt.md",
-      "issue-consult": "task-kit.issue-consult.prompt.md",
-    },
+    prompts: { "new-task": "task-kit.new-task.prompt.md" },
   },
   {
-    skill: "task-kit-plan",
+    skill: "task-kit-task-update",
+    agent: "task-kit.task.agent.md",
+    prompts: { "task-update": "task-kit.task-update.prompt.md" },
+  },
+  {
+    skill: "task-kit-issue-consult",
+    agent: "task-kit.task.agent.md",
+    prompts: { "issue-consult": "task-kit.issue-consult.prompt.md" },
+  },
+  {
+    skill: "task-kit-plan-update",
     agent: "task-kit.plan.agent.md",
     prompts: { "plan-update": "task-kit.plan-update.prompt.md" },
   },
   {
-    skill: "task-kit-execute",
+    skill: "task-kit-task-execute",
     agent: "task-kit.execute.agent.md",
     prompts: { "task-execute": "task-kit.task-execute.prompt.md" },
   },
@@ -63,24 +69,31 @@ test("すべての Copilot agent と prompt が同等性検証の対象になっ
     path.join(repositoryRoot, "templates", "github", "prompts"),
   )).filter((file) => file.startsWith("task-kit.") && file.endsWith(".prompt.md")).sort();
 
-  assert.deepEqual(parityCases.map((entry) => entry.agent).sort(), agentFiles);
+  assert.deepEqual([...new Set(parityCases.map((entry) => entry.agent))].sort(), agentFiles);
   assert.deepEqual(
     parityCases.flatMap((entry) => Object.values(entry.prompts)).sort(),
     promptFiles,
   );
 });
 
+test("6 skill はディレクトリ名と一致する frontmatter name を持つ", async () => {
+  for (const parityCase of parityCases) {
+    const skill = await readNormalized(path.join(repositoryRoot, "templates", "skills", parityCase.skill, "SKILL.md"));
+    assert.match(skill, new RegExp(`^---\\nname: ${parityCase.skill}\\n`, "m"));
+  }
+});
+
 test("実行セッションパッケージは Codex と Claude Code の呼び出し記法を定義する", async () => {
   const planSkill = await readNormalized(
-    path.join(repositoryRoot, "templates", "skills", "task-kit-plan", "SKILL.md"),
+    path.join(repositoryRoot, "templates", "skills", "task-kit-plan-update", "SKILL.md"),
   );
   const executeSkill = await readNormalized(
-    path.join(repositoryRoot, "templates", "skills", "task-kit-execute", "SKILL.md"),
+    path.join(repositoryRoot, "templates", "skills", "task-kit-task-execute", "SKILL.md"),
   );
 
   for (const skill of [planSkill, executeSkill]) {
-    assert.match(skill, /\$task-kit-execute/);
-    assert.match(skill, /\/task-kit-execute/);
+    assert.match(skill, /\$task-kit-task-execute/);
+    assert.match(skill, /\/task-kit-task-execute/);
   }
   assert.match(executeSkill, /\/task-kit\.task-execute/);
 });

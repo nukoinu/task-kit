@@ -27,8 +27,9 @@ test("init --codex は skills を .agents/skills に展開する", async (contex
   await assertTemplateTree(path.join(templatesRoot, "skills"), path.join(targetRoot, ".agents", "skills"));
   assert.equal(await pathExists(path.join(targetRoot, "AGENTS.md")), true);
   assert.equal(await pathExists(path.join(targetRoot, ".github")), false);
-  const skill = await fs.readFile(path.join(targetRoot, ".agents", "skills", "task-kit-task", "SKILL.md"), "utf8");
+  const skill = await fs.readFile(path.join(targetRoot, ".agents", "skills", "task-kit-new-task", "SKILL.md"), "utf8");
   assert.doesNotMatch(skill, /\.github[\\/]/);
+  assert.equal(await pathExists(path.join(targetRoot, ".markdownlint.jsonc")), true);
 });
 
 test("init --claude は skills を .claude/skills に展開する", async (context) => {
@@ -96,6 +97,20 @@ test("init --force は配布対象を上書きする", async (context) => {
   );
 });
 
+test("Markdownlint 設定は既存設定を通常時に上書きせず、--force で更新する", async (context) => {
+  const targetRoot = await createTargetRoot(context);
+  const targetPath = path.join(targetRoot, ".markdownlint.jsonc");
+  await writeFile(targetPath, "{\n  // user config\n}\n");
+
+  const conflict = runCli(targetRoot, "init", "--codex");
+  assert.equal(conflict.status, 5);
+  assert.match(await fs.readFile(targetPath, "utf8"), /user config/);
+
+  const forced = runCli(targetRoot, "init", "--codex", "--force");
+  assert.equal(forced.status, 0, forced.stderr);
+  assert.match(await fs.readFile(targetPath, "utf8"), /task-kit-managed/);
+});
+
 test("init --sync は廃止資産を削除し、保護対象と他製品資産を維持する", async (context) => {
   const targetRoot = await createTargetRoot(context);
   const stalePath = path.join(targetRoot, ".github", "prompts", "task-kit.retired.prompt.md");
@@ -160,7 +175,7 @@ test("switch --copilot-to-codex は対象資産を展開後に Copilot 管理資
   const result = runCli(targetRoot, "switch", "--copilot-to-codex");
 
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(await pathExists(path.join(targetRoot, ".agents", "skills", "task-kit-task", "SKILL.md")), true);
+  assert.equal(await pathExists(path.join(targetRoot, ".agents", "skills", "task-kit-new-task", "SKILL.md")), true);
   assert.equal(await pathExists(path.join(targetRoot, ".github", "agents", "task-kit.task.agent.md")), false);
   assert.equal(await pathExists(path.join(targetRoot, ".github", "prompts", "task-kit.new-task.prompt.md")), false);
   assert.equal(await fs.readFile(otherPath, "utf8"), "他製品");
@@ -174,7 +189,7 @@ test("switch --copilot-to-claude は Claude Code 資産へ移行する", async (
   const result = runCli(targetRoot, "switch", "--copilot-to-claude");
 
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(await pathExists(path.join(targetRoot, ".claude", "skills", "task-kit-task", "SKILL.md")), true);
+  assert.equal(await pathExists(path.join(targetRoot, ".claude", "skills", "task-kit-new-task", "SKILL.md")), true);
   assert.equal(await pathExists(path.join(targetRoot, "CLAUDE.md")), true);
   assert.equal(await pathExists(path.join(targetRoot, ".github", "agents", "task-kit.task.agent.md")), false);
 });
@@ -183,7 +198,7 @@ test("switch は移行先競合時に Copilot 管理資産を削除しない", a
   const targetRoot = await createTargetRoot(context);
   assert.equal(runCli(targetRoot, "init").status, 0);
   const sourcePath = path.join(targetRoot, ".github", "agents", "task-kit.task.agent.md");
-  const targetPath = path.join(targetRoot, ".agents", "skills", "task-kit-task", "SKILL.md");
+  const targetPath = path.join(targetRoot, ".agents", "skills", "task-kit-new-task", "SKILL.md");
   await writeFile(targetPath, "利用者の変更");
 
   const result = runCli(targetRoot, "switch", "--copilot-to-codex");
@@ -222,7 +237,7 @@ test("製品オプションの複数指定、switch の移行先未指定、--ta
 });
 
 async function createTargetRoot(context) {
-  const targetRoot = await fs.mkdtemp(path.join(os.tmpdir(), "task-kit-cli-"));
+  const targetRoot = await fs.mkdtemp(path.join(process.env.TMPDIR || "/tmp", "task-kit-cli-"));
   context.after(() => fs.rm(targetRoot, { recursive: true, force: true }));
   return targetRoot;
 }
