@@ -20,12 +20,20 @@ jobs:
           node-version: 22
 
       - name: Build release tarball
+        id: build
         working-directory: cli
         run: |
           npm install
+          package_version=$(node -p "require('./package.json').version")
+          tag_version="${GITHUB_REF_NAME#v}"
+          if [ "$package_version" != "$tag_version" ]; then
+            echo "タグ ($tag_version) と package.json ($package_version) のバージョンが一致しません。"
+            exit 1
+          fi
           npm run pack:release
+          echo "asset=cli/task-kit-cli-${package_version}.tgz" >> "$GITHUB_OUTPUT"
 
       - name: Upload tarball to release
         uses: softprops/action-gh-release@v3
         with:
-          files: cli/task-kit-cli-*.tgz
+          files: ${{ steps.build.outputs.asset }}

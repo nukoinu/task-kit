@@ -41,7 +41,7 @@ node src/index.js init
 GitHub Releases から直接インストールする場合:
 
 ```powershell
-npm install -g https://github.com/<OWNER>/<REPO>/releases/download/v0.2.0/task-kit-cli-0.2.0.tgz
+npm install -g https://github.com/<OWNER>/<REPO>/releases/download/v0.5.2/task-kit-cli-0.5.2.tgz
 task-kit init
 ```
 
@@ -180,3 +180,4 @@ Copilot では `.github/prompts`、Codex / Claude Code では `task-kit-new-task
 
 - 現行設計書: `docs/README.md`
 - CLI 詳細: `cli/README.md`
+- 変更履歴: `CHANGELOG.md`
