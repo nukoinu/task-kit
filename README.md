@@ -38,6 +38,24 @@ npm run init
 node src/index.js init
 ```
 
+## Markdown の検証
+
+Task-Kit を初期化した利用者プロジェクトでは、配布された Markdown lint 設定を使って次を実行します。
+
+```powershell
+task-kit lint
+```
+
+安全な自動修正を適用する場合は `task-kit lint --fix` を実行します。
+
+このリポジトリを開発する場合は、`cli` ディレクトリで依存関係をインストールした後、次を実行します。
+
+```powershell
+cd cli
+npm install
+npm run lint:md
+```
+
 GitHub Releases から直接インストールする場合:
 
 ```powershell
