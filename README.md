@@ -59,7 +59,7 @@ npm run lint:md
 GitHub Releases から直接インストールする場合:
 
 ```powershell
-npm install -g https://github.com/<OWNER>/<REPO>/releases/download/v0.5.3/task-kit-cli-0.5.3.tgz
+npm install -g https://github.com/<OWNER>/<REPO>/releases/download/v0.5.4/task-kit-cli-0.5.4.tgz
 task-kit init
 ```
 
