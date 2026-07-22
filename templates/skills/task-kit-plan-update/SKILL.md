@@ -1,29 +1,27 @@
 ---
-name: task-kit-plan
-description: Task-Kit の plan-update を Copilot 版と同じ契約で実行し、実行可能な plan.md、review.md、実行セッションパッケージを作る。
+name: task-kit-plan-update
+description: Task-Kit の plan-update を Copilot と同じ自己完結契約で実行する。
 ---
 
-# task-kit-plan
+# task-kit-plan-update
 
 ## 製品別適用規則（最優先）
 
-- 以下の agent 契約と、選択した command 契約を両方適用する。重複時はより厳しい制約を優先し、どちらの手順・停止条件・出力条件も省略しない。
-- command 契約の `#.task-kit/...` は添付済みとは仮定せず、リポジトリ内の対応する `.task-kit/...` を直接読む。
-- agent 契約にある他 agent への委譲は、現在の製品で対応する Task-Kit skill の呼び出しとして扱う。この skill 自身の責務は別 agent へ委譲せず、直接実行する。
-- このファイルは自己完結した実行契約である。別製品のテンプレートを実行時に読んで補完しない。
-- 論理操作 `/task-kit.plan-update` は、この `task-kit-plan` skill の呼び出しに対応する。
-- 実行セッションパッケージのコードブロック先頭行は、Codex では `$task-kit-execute`、Claude Code では `/task-kit-execute` とする。元契約の `/task-kit.task-execute` はこの製品別呼び出しへ読み替える。
+- 以下の agent 契約と command 契約を両方適用し、手順、停止条件、状態遷移、出力契約を省略しない。
+- `#.task-kit/...` は添付済みと仮定せず、リポジトリ内の対応する `.task-kit/...` を直接読む。
+- 他 agent への委譲は、対応する新しい Task-Kit skill の呼び出しとして扱う。この skill 自身は直接実行する。
+- このファイルは自己完結した実行契約であり、別製品のテンプレートを実行時に読んで補完しない。
 
-### 論理コマンドと製品別呼び出し
+### 論理操作と製品別呼び出し
 
-| 論理コマンド | Codex | Claude Code |
-|---|---|---|
-| `/task-kit.new-task` | `$task-kit-task new-task` | `/task-kit-task new-task` |
-| `/task-kit.task-update` | `$task-kit-task task-update` | `/task-kit-task task-update` |
-| `/task-kit.issue-consult` | `$task-kit-task issue-consult` | `/task-kit-task issue-consult` |
-| `/task-kit.plan-update` | `$task-kit-plan` | `/task-kit-plan` |
-| `/task-kit.task-execute` | `$task-kit-execute` | `/task-kit-execute` |
-| `/task-kit.review` | `$task-kit-review` | `/task-kit-review` |
+| 論理操作 | Copilot | Claude Code | Codex |
+| --- | --- | --- | --- |
+| new-task | `/task-kit.new-task` | `/task-kit-new-task` | `$task-kit-new-task` |
+| task-update | `/task-kit.task-update` | `/task-kit-task-update` | `$task-kit-task-update` |
+| plan-update | `/task-kit.plan-update` | `/task-kit-plan-update` | `$task-kit-plan-update` |
+| task-execute | `/task-kit.task-execute` | `/task-kit-task-execute` | `$task-kit-task-execute` |
+| review | `/task-kit.review` | `/task-kit-review` | `$task-kit-review` |
+| issue-consult | `/task-kit.issue-consult` | `/task-kit-issue-consult` | `$task-kit-issue-consult` |
 
 ## Agent 契約
 
@@ -75,6 +73,11 @@ description: Task-Kit の plan-update を Copilot 版と同じ契約で実行し
 - 未確定事項または残リスク
 - 次アクション
 - 実行可能な計画を確定した場合は、新規セッションへ貼り付ける実行セッションパッケージ
+## Markdown の検証
+
+- Markdown ファイルを作成または更新した場合は、リポジトリの Markdownlint 設定に従って変更対象を検証する。
+- 自動修正によって文書の意味、Task-Kit テンプレート構造、frontmatter、管理コメント、状態、受け入れ基準を変更してはならない。
+- 作業完了時には、今回作成・変更した Markdown へ Markdownlint 警告を残さない。意味上の変更が必要な場合は自動修正せず、停止または明示報告する。
 <!-- task-kit-parity:agent:end -->
 
 ## Command 契約
@@ -90,4 +93,12 @@ Task-Kit の計画更新を `task-kit.plan` へ委譲する。
 - タスクパス（任意。未指定時は `.task-kit/current-task.md` を参照）
 - 計画更新内容（必須）
 - 制約・完了条件・レビュー要件（任意）
+
+
+
+## Markdown の検証
+
+- Markdown ファイルを作成または更新した場合は、リポジトリの Markdownlint 設定に従って変更対象を検証する。
+- 自動修正によって文書の意味、Task-Kit テンプレート構造、frontmatter、管理コメント、状態、受け入れ基準を変更してはならない。
+- 作業完了時には、今回作成・変更した Markdown へ Markdownlint 警告を残さない。意味上の変更が必要な場合は自動修正せず、停止または明示報告する。
 <!-- task-kit-parity:prompt:plan-update:end -->

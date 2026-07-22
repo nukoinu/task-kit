@@ -59,7 +59,7 @@ async function runInit(options) {
     await copyFiles(source, files, {
       force,
       sync,
-      preserveExisting: preserveTaskKit && source.name === ".task-kit",
+      preserveExisting: preserveTaskKit && (source.name === ".task-kit" || source.preserveExisting),
       operations,
       conflicts,
     });
@@ -128,6 +128,13 @@ function buildSources(options) {
   return [
     productSource,
     {
+      name: "",
+      from: path.join(options.templatesRoot, "markdownlint"),
+      to: options.targetRoot,
+      root: options.targetRoot,
+      preserveExisting: true,
+    },
+    {
       name: ".task-kit",
       from: path.join(options.templatesRoot, ".task-kit"),
       to: path.join(options.targetRoot, ".task-kit"),
@@ -154,6 +161,7 @@ async function hasRequiredTemplates(rootPath) {
     path.join(rootPath, "github", "prompts"),
     path.join(rootPath, ".task-kit"),
     path.join(rootPath, "skills"),
+    path.join(rootPath, "markdownlint", ".markdownlint.jsonc"),
     path.join(rootPath, "codex", "AGENTS.md"),
     path.join(rootPath, "claude", "CLAUDE.md"),
   ];
@@ -200,7 +208,7 @@ async function copyFiles(source, files, options) {
     const sourcePath = safeResolve(source.from, relativePath);
     const destinationPath = safeResolve(source.to, relativePath);
     const targetRelativePath = path.join(source.name, relativePath);
-    await ensurePathDoesNotTraverseSymbolicLink(targetRootFor(source.to), destinationPath);
+    await ensurePathDoesNotTraverseSymbolicLink(source.root || targetRootFor(source.to), destinationPath);
     const exists = await pathExists(destinationPath);
 
     if (exists && (isProtectedPath(source.name, relativePath) || options.preserveExisting)) {
