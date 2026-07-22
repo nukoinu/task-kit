@@ -2,6 +2,7 @@
 
 const { EXIT_CODES } = require("./exit-codes");
 const { runInit, runSwitch } = require("./services/init");
+const { runLint } = require("./services/lint");
 const { AppError } = require("./utils/app-error");
 
 async function main(argv) {
@@ -33,6 +34,13 @@ async function main(argv) {
       force: options.force,
       sync: options.sync,
     });
+  } else if (command === "lint") {
+    const options = parseLintOptions(commandArgs);
+    const lintResult = await runLint({ targetRoot: process.cwd(), ...options });
+    if (lintResult.output) {
+      process.stdout.write(lintResult.output);
+    }
+    return lintResult.status === 0 ? EXIT_CODES.SUCCESS : EXIT_CODES.PLAN_CONSTRAINT_ERROR;
   } else {
     throw new AppError(`不明なコマンドです: ${command}`, EXIT_CODES.INPUT_ERROR);
   }
@@ -55,6 +63,19 @@ async function main(argv) {
     console.log(`対象製品: ${result.product}`);
   }
   return EXIT_CODES.SUCCESS;
+}
+
+function parseLintOptions(args) {
+  const options = { fix: false, paths: [] };
+  for (const arg of args) {
+    if (arg === "--fix") { options.fix = true; continue; }
+    if (arg === "-h" || arg === "--help") { printHelp(); process.exit(EXIT_CODES.SUCCESS); }
+    if (arg.startsWith("-")) {
+      throw new AppError(`不明なオプションです: ${arg}`, EXIT_CODES.INPUT_ERROR);
+    }
+    options.paths.push(arg);
+  }
+  return options;
 }
 
 function parseInitOptions(args) {
@@ -128,6 +149,7 @@ function printHelp() {
   console.log("使い方:");
   console.log("  task-kit init [--copilot|--codex|--claude] [--force] [--sync]");
   console.log("  task-kit switch [--copilot-to-codex|--copilot-to-claude] [--force] [--sync]");
+  console.log("  task-kit lint [--fix] [paths...]");
   console.log("");
   console.log("オプション:");
   console.log("  --copilot            GitHub Copilot 用資産を展開する (init の既定値)");
@@ -137,6 +159,7 @@ function printHelp() {
   console.log("  --copilot-to-claude  Copilot 用 Task-Kit 資産を Claude Code 用へ移行する");
   console.log("  --force              既存の Task-Kit 管理資産を上書きする");
   console.log("  --sync               選択製品の廃止済み Task-Kit 管理資産を削除する");
+  console.log("  --fix                Markdown lint の安全な自動修正を適用する");
 }
 
 process.on("SIGINT", () => {

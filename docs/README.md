@@ -78,11 +78,11 @@ task-kit switch [--copilot-to-codex|--copilot-to-claude] [--force] [--sync]
 
 標準フローは `new-task` / `task-update` → `plan-update` → `task-execute` → `review` である。`issue-consult` は課題の整理と対応案の検討に使う。
 
-Codex / Claude Code では `task-kit-task`、`task-kit-plan`、`task-kit-execute`、`task-kit-review` の Agent Skills を同じ責務境界で配布する。各 skill は対応する Copilot agent 本文と command prompt 本文を静的な自己完結契約として保持する。製品差分は呼び出し記法、添付参照、agent 委譲の skill 呼び出しへの読み替えだけとし、手順、停止条件、状態遷移、出力契約は省略しない。展開後の skill は別製品のテンプレートを実行時に参照しない。
+Codex / Claude Code では `task-kit-new-task`、`task-kit-task-update`、`task-kit-plan-update`、`task-kit-task-execute`、`task-kit-review`、`task-kit-issue-consult` の Agent Skills を配布する。各 skill は対応する Copilot agent 本文と command prompt 本文を静的な自己完結契約として保持する。製品差分は呼び出し記法、添付参照、agent 委譲の skill 呼び出しへの読み替えだけとし、手順、停止条件、状態遷移、出力契約は省略しない。展開後の skill は別製品のテンプレートを実行時に参照しない。
 
 `cli/test/skill-parity.test.js` は Copilot agent・prompt の frontmatter を除く契約本文が各 skill の対応区間と一致することを検証する。Copilot 側の契約を変更した場合は、対応 skill も同じ変更で更新しなければテストを失敗させる。
 
-計画の確定後、計画担当は参照先中心の「実行セッションパッケージ」を提示し、利用者は新しいセッションで製品に対応した `task-kit-execute` 呼び出しを開始する。パッケージにはタスクパス、依存関係が明確な連続ステップ群、一次入力の参照先、追加制約、検証差分だけを含める。初回パッケージなしの直接実行は書込み・状態遷移・外部操作をせず、パッケージ作成と新規セッション案内だけを行う。
+計画の確定後、計画担当は参照先中心の「実行セッションパッケージ」を提示し、利用者は新しいセッションで製品に対応した `task-kit-task-execute` 呼び出しを開始する。Copilot は `/task-kit.task-execute`、Claude Code は `/task-kit-task-execute`、Codex は `$task-kit-task-execute` を使う。パッケージにはタスクパス、依存関係が明確な連続ステップ群、一次入力の参照先、追加制約、検証差分だけを含める。初回パッケージなしの直接実行は書込み・状態遷移・外部操作をせず、パッケージ作成と新規セッション案内だけを行う。
 
 ### 5.2 タスク領域
 
