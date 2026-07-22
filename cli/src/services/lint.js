@@ -16,7 +16,7 @@ async function runLint(options) {
 
   let executable;
   try {
-    executable = require.resolve("markdownlint-cli2/markdownlint-cli2.js");
+    executable = resolveLintExecutable();
   } catch (error) {
     throw new AppError("Markdown lint の依存関係が見つかりません。CLI を再インストールしてください。", EXIT_CODES.INTERNAL_ERROR, error);
   }
@@ -26,6 +26,21 @@ async function runLint(options) {
     throw new AppError("Markdown lint を実行できませんでした。", EXIT_CODES.INTERNAL_ERROR, result.error);
   }
   return { output: `${result.stdout || ""}${result.stderr || ""}`, status: result.status ?? EXIT_CODES.INTERNAL_ERROR };
+}
+
+function resolveLintExecutable() {
+  for (const entryPoint of [
+    "markdownlint-cli2",
+    "markdownlint-cli2/markdownlint-cli2.mjs",
+    "markdownlint-cli2/markdownlint-cli2.js",
+  ]) {
+    try {
+      return require.resolve(entryPoint);
+    } catch {
+      // 次のエントリポイントを試す。
+    }
+  }
+  throw new Error("markdownlint-cli2 executable was not found");
 }
 
 async function resolveMarkdownPaths(targetRoot, requestedPaths) {
@@ -65,4 +80,4 @@ async function pathExists(targetPath) {
   try { await fs.access(targetPath); return true; } catch { return false; }
 }
 
-module.exports = { runLint };
+module.exports = { runLint, resolveLintExecutable };
