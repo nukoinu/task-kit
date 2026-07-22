@@ -8,4 +8,5 @@
 - 承認済み計画の実行には `$task-kit-task-execute` を使う。
 - 独立レビューには `$task-kit-review` を使う。
 - `references/` は参照専用、`outputs/` は成果物、`records/` は判断・実施記録として扱う。
+- Task-Kit 管理資産や Markdown を変更した場合は `task-kit lint` を実行する。安全な自動修正には `task-kit lint --fix` を使う。
 <!-- task-kit:codex:end -->

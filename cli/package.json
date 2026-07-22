@@ -23,7 +23,7 @@
     "start": "node src/index.js",
     "init": "node src/index.js init",
     "check:js": "node --check src/index.js && node --check src/services/init.js && node --check src/services/lint.js",
-    "lint:md": "markdownlint-cli2 \"../**/*.md\" \"#../node_modules\" \"#../.git\" \"#../cli/node_modules\"",
+    "lint:md": "markdownlint-cli2 \"../**/*.md\" \"#../node_modules\" \"#../.git\" \"#../cli/node_modules\" --config ../.markdownlint.jsonc",
     "check": "npm run check:js && npm run lint:md",
     "test": "node --test"
   },

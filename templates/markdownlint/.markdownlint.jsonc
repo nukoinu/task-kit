@@ -11,5 +11,19 @@
   // Frontmatter is required by Copilot agents and Agent Skills.
   "MD041": false,
   // Contract labels are semantic headings, not paragraph text.
-  "MD036": false
+  "MD036": false,
+  // Distribution contracts preserve compact lists, examples, and copied sections.
+  "MD005": false,
+  "MD007": false,
+  "MD009": false,
+  "MD010": false,
+  "MD012": false,
+  "MD022": false,
+  "MD025": false,
+  "MD029": false,
+  "MD031": false,
+  "MD032": false,
+  "MD047": false,
+  "MD058": false,
+  "MD060": false
 }
